@@ -15,5 +15,13 @@ class port:
         x, y = int(x/grid.deltaX), int(y/grid.deltaY)
         result = grid.evenGrid[x, y]
 
+        # apply value change
+        if mode == 'append':
+            grid.evenGrid[x, y] += value
+        elif mode == 'set':
+            grid.evenGrid[x, y] = value
+        else:
+            raise AttributeError('mode')
+            
         # return value
         return result
