@@ -6,6 +6,7 @@ class port:
     def __init__(self, position):
         # save arguments
         self.position = position
+        self.values = []
 
     def update(self, grid, value=0.0, mode='append'):
         """Updates data port and connected grid"""
@@ -13,7 +14,7 @@ class port:
         # get result value
         x, y = self.position
         x, y = int(x/grid.deltaX), int(y/grid.deltaY)
-        result = grid.oddGrid[x, y]
+        self.values.append([grid.oddGrid[x, y]])
 
         # apply value change
         if mode == 'append':
@@ -22,7 +23,3 @@ class port:
             grid.oddGrid[x, y] = value
         else:
             raise AttributeError('mode')
-            
-        # return and save value
-        self.value = result
-        return result
