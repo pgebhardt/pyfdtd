@@ -20,7 +20,7 @@ class solver:
         c3 = deltaT/(self.grid.deltaX*constants.permea)
         c4 = deltaT/(self.grid.deltaY*constants.permea)
 
-        # swap constants im neccessary
+        # swap constants if neccessary
         if self.mode == 'TEz':
             c1, c2, c3, c4 = c3, c4, c1, c2
 
