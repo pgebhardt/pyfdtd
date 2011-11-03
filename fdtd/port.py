@@ -23,5 +23,6 @@ class port:
         else:
             raise AttributeError('mode')
             
-        # return value
+        # return and save value
+        self.value = result
         return result
