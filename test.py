@@ -17,3 +17,5 @@ solver = fdtd.solver(fdtd.grid(0.5, 0.5, 2.0, 2.0), fdtd.material(epsilon, mu, s
 
 for port in solver.ports:
     print port.update(solver.grid)
+
+solver.iterate(0.01, 100)
