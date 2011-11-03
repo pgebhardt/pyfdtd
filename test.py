@@ -12,7 +12,8 @@ for x1 in range(0, xdim, 1):
     for y1 in range(0, ydim, 1):
         epsilon[x1, y1] = x1*y1
 
-mat = fdtd.material(epsilon, mu, sigma)
+# create solver
+solver = fdtd.solver(fdtd.grid(0.5, 0.5, 2.0, 2.0), fdtd.material(epsilon, mu, sigma), ports=[fdtd.port( (1.0, 1.0) )])
 
-for key in mat.oddGrid.iterkeys():
-    print key, mat.oddGrid[key]
+for port in solver.ports:
+    print port.update(solver.grid)
