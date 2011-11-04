@@ -1,17 +1,17 @@
+import math
 import numpy
 import scipy.interpolate
 import matplotlib.pyplot as plt
 import fdtd
 
-epsilon = numpy.zeros( (4, 4) )
-mu = numpy.zeros( (4, 4) )
-sigma = numpy.zeros( (4, 4) )
+epsilon = numpy.ones( (4, 4) )
+mu = numpy.ones( (4, 4) )
+sigma = numpy.ones( (4, 4) )
 
 xdim, ydim = epsilon.shape
-
-for x1 in range(0, xdim, 1):
-    for y1 in range(0, ydim, 1):
-        epsilon[x1, y1] = x1*y1
+for i in range(0, xdim, 1):
+    for j in range(0, ydim, 1):
+        epsilon[i, j] = 4.0
 
 # create listen ports
 portlist = []
@@ -20,10 +20,8 @@ for i in range(1, 5, 1):
 
 # add source port
 def f(t):
-    if t == 0.0:
-        return 1.0
-    else:
-        return 0.0
+    x = t - 300e-12
+    return math.exp(-x**2/(2.0*50.0e-12**2))*math.cos(2.0*math.pi*40e9*x)
 
 portlist.append(fdtd.port( (0.025, 0.025), f))
 
@@ -35,7 +33,7 @@ solver = fdtd.solver(fdtd.grid(0.05, 0.05, 0.001, 0.001), fdtd.material(0.05, 0.
 solver.material.set_material({'epsilon': epsilon, 'mu': mu, 'sigma': sigma})
 
 # iterate
-solver.iterate(0.5e-12, 500.0e-12)
+solver.iterate(1.0e-12, 500.0e-12)
 
 #plot ports
 plt.figure(1)

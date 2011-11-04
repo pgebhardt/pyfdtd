@@ -23,9 +23,18 @@ class solver:
         c3 = deltaT/(self.grid.deltaX*constants.permea)
         c4 = -deltaT/(self.grid.deltaY*constants.permea)
 
-        # swap constants if neccessary
-        if self.mode == 'TEz':
+        # apply mode
+        if self.mode == 'TMz':
+            m1 = self.material.oddGrid['epsilon']
+            m2 = self.material.evenGridX['mu']
+            m3 = self.material.evenGridY['mu']
+        elif self.mode == 'TEz':
             c1, c2, c3, c4 = -c3, -c4, -c1, -c2
+            m1 = self.material.oddGrid['mu']
+            m2 = self.material.evenGridX['epsilon']
+            m3 = self.material.evenGridY['epsilon']
+        else:
+            raise ArgumentError
 
         # iterate
         for t in numpy.arange(0.0, time, deltaT):
@@ -37,16 +46,16 @@ class solver:
             xshape, yshape = self.grid.oddGrid.shape
             for x in range(0, xshape, 1):
                 for y in range(0, yshape, 1):
-                    self.grid.oddGrid[x, y] += c1*(self.grid.evenGridY[x+1, y] - self.grid.evenGridY[x, y]) + c2*(self.grid.evenGridX[x, y+1] - self.grid.evenGridX[x, y])
+                    self.grid.oddGrid[x, y] += (1.0/m1[x, y])*c1*(self.grid.evenGridY[x+1, y] - self.grid.evenGridY[x, y]) + (1.0/m1[x, y])*c2*(self.grid.evenGridX[x, y+1] - self.grid.evenGridX[x, y])
 
             # calc even Grid
             for x in range(0, xshape, 1):
                 for y in range(1, yshape, 1):
-                    self.grid.evenGridX[x, y] += c4*(self.grid.oddGrid[x, y] - self.grid.oddGrid[x, y-1])
+                    self.grid.evenGridX[x, y] += (1.0/m2[x, y])*c4*(self.grid.oddGrid[x, y] - self.grid.oddGrid[x, y-1])
 
             for x in range(1, xshape, 1):
                 for y in range(0, yshape, 1):
-                    self.grid.evenGridY[x, y] += c3*(self.grid.oddGrid[x, y] - self.grid.oddGrid[x-1, y])
+                    self.grid.evenGridY[x, y] += (1.0/m3[x, y])*c3*(self.grid.oddGrid[x, y] - self.grid.oddGrid[x-1, y])
 
             # print a dot every 100 steps
             if t/deltaT % 100 == 0:
