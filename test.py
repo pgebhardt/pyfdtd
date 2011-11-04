@@ -4,14 +4,10 @@ import scipy.interpolate
 import matplotlib.pyplot as plt
 import fdtd
 
-epsilon = numpy.ones( (4, 4) )
-mu = numpy.ones( (4, 4) )
-sigma = numpy.zeros( (4, 4) )
-
 # create listen ports
 portlist = []
 for i in range(1, 5, 1):
-    portlist.append(fdtd.port( (i * 0.01, 0.0) ))
+    portlist.append(fdtd.port( (i*0.01, 0.0) ))
 
 # add source port
 def f(t):
@@ -24,13 +20,10 @@ portlist.append(fdtd.port( (0.025, 0.025), f))
 solver = fdtd.solver(fdtd.grid(0.05, 0.05, 0.001, 0.001), fdtd.material(0.05, 0.05, 0.001, 0.001), 
     ports=portlist)
 
-# set materal
-solver.material.set_material({'epsilon': epsilon, 'mu': mu, 'sigma': sigma})
-
 # iterate
 solver.iterate(1.0e-12, 1000.0e-12)
 
-#plot ports
+# plot ports
 plt.figure(1)
 
 for port in solver.ports:
