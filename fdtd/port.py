@@ -11,19 +11,20 @@ class port:
 
     def update(self, grid, t=0.0, mode='append'):
         """Updates data port and connected grid"""
-        
-        # get result value
         x, y = self.position
         x, y = int(x/grid.deltaX), int(y/grid.deltaY)
-        self.values.append([grid.oddGrid[x, y]])
 
         # apply function
         if self.function:
             f = self.function(t)
-        
+                 
             if mode == 'append':
-                grid.oddGrid[x, y] += value
+                grid.oddGrid[x, y] += f
             elif mode == 'set':
-                grid.oddGrid[x, y] = value
+                grid.oddGrid[x, y] = f
             else:
                 raise AttributeError('mode')
+
+        # get result value
+        self.values.append([grid.oddGrid[x, y]])
+

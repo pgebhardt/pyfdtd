@@ -1,7 +1,7 @@
 import numpy
 from constants import constants
-from grid import grid
 from material import material
+import grid as gr
 
 class solver:
     """Solves FDTD equations on given grid, with given materials and ports"""
@@ -12,7 +12,10 @@ class solver:
         self.mode = mode
         self.ports = ports
 
-    def iterate(self, deltaT, timesteps):
+        # create memory grid
+        self.memoryGrid = gr.grid(self.grid.xSize, self.grid.ySize, self.grid.deltaX, self.grid.deltaY)
+
+    def iterate(self, deltaT, time):
         """Iterates the FDTD algorithm in respect of the pre-defined ports"""
         # create constants
         c1 = deltaT/(self.grid.deltaX*constants.permit)
@@ -25,7 +28,11 @@ class solver:
             c1, c2, c3, c4 = -c3, -c4, -c1, -c2
 
         # iterate
-        for i in range(0, timesteps, 1):
+        for t in numpy.arange(0.0, time, deltaT):
+            # update ports
+            for port in self.ports:
+                port.update(self.grid, t)
+
             # calc odd Grid
             xshape, yshape = self.grid.oddGrid.shape
             for x in range(0, xshape, 1):
@@ -41,6 +48,6 @@ class solver:
                 for y in range(0, yshape, 1):
                     self.grid.evenGridY[x, y] += c3*(self.grid.oddGrid[x, y] - self.grid.oddGrid[x-1, y])
 
-            # update ports
-            for port in self.ports:
-                port.update(self.grid)
+            # print a dot every 100 steps
+            if t/deltaT % 100 == 0:
+                print '.',
