@@ -21,9 +21,12 @@ for i in range(1, 5, 1):
 
 # create solver
 solver = fdtd.solver(fdtd.grid(0.001, 0.001, 0.05, 0.05), fdtd.material(epsilon, mu, sigma), ports=portlist)
+print solver.material.oddGrid['epsilon']
+print solver.material.evenGrid['epsilon']
+
 solver.grid.oddGrid[25, 25] = 1.0
 
-solver.iterate(1.0e-12, 100)
+solver.iterate(1.0e-12, 500)
 
 plt.figure(1)
 
