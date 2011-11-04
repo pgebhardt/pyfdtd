@@ -19,12 +19,11 @@ class port:
             f = self.function(t)
                  
             if mode == 'append':
-                grid.oddGrid[x, y] += f
+                grid.oddGrid['flux'][x, y] += f
             elif mode == 'set':
-                grid.oddGrid[x, y] = f
+                grid.oddGrid['flux'][x, y] = f
             else:
                 raise AttributeError('mode')
 
         # get result value
-        self.values.append([grid.oddGrid[x, y]])
-
+        self.values.append([grid.oddGrid['flux'][x, y]])
