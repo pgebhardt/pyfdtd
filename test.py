@@ -7,7 +7,7 @@ import fdtd
 # create listen ports
 portlist = []
 for i in range(1, 5, 1):
-    portlist.append(fdtd.port( (i*0.01, 0.0) ))
+    portlist.append(fdtd.port( (i*0.01, 0.01) ))
 
 # add source port
 def f(t):

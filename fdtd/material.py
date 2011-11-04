@@ -9,8 +9,8 @@ class material:
         yShape = ySize/deltaY
 
         self.oddGrid = {'epsilon': numpy.ones((xShape, yShape)), 'mu': numpy.ones((xShape, yShape)), 'sigma': numpy.zeros((xShape, yShape))}
-        self.evenGridX = {'epsilon': numpy.ones((xShape+1, yShape+1)), 'mu': numpy.ones((xShape+1, yShape+1)), 'sigma': numpy.zeros((xShape+1, yShape+1))}
-        self.evenGridY = {'epsilon': numpy.ones((xShape+1, yShape+1)), 'mu': numpy.ones((xShape+1, yShape+1)), 'sigma': numpy.zeros((xShape+1, yShape+1))}
+        self.evenGridX = {'epsilon': numpy.ones((xShape, yShape)), 'mu': numpy.ones((xShape, yShape)), 'sigma': numpy.zeros((xShape, yShape))}
+        self.evenGridY = {'epsilon': numpy.ones((xShape, yShape)), 'mu': numpy.ones((xShape, yShape)), 'sigma': numpy.zeros((xShape, yShape))}
 
         # save atributes
         self.xSize = xSize
