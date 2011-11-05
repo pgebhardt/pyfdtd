@@ -31,3 +31,5 @@ for port in solver.ports:
     plt.plot(port.values)
 
 plt.show()
+
+print solver.grid.evenGridX['field']
