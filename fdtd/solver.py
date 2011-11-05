@@ -50,11 +50,11 @@ class solver:
 
             # calc odd Grid
             xshape, yshape = self.grid.oddGrid['field'].shape
-            for x in range(1, xshape, 1):
-                for y in range(1, yshape, 1):
+            for x in range(0, xshape, 1):
+                for y in range(0, yshape, 1):
                     # calc flux density
-                    self.grid.oddGrid['flux'][x, y] += c1*(self.grid.evenGridY['field'][x, y] - self.grid.evenGridY['field'][x-1, y]) 
-                    self.grid.oddGrid['flux'][x, y] -= c2*(self.grid.evenGridX['field'][x, y] - self.grid.evenGridX['field'][x, y-1])
+                    self.grid.oddGrid['flux'][x, y] += c1*(self.grid.evenGridY['field'][x+1, y] - self.grid.evenGridY['field'][x, y]) 
+                    self.grid.oddGrid['flux'][x, y] -= c2*(self.grid.evenGridX['field'][x, y+1] - self.grid.evenGridX['field'][x, y])
 
                     # calc field
                     self.grid.oddGrid['field'][x, y] = (1.0/(c3*m1[x, y] + m2[x, y]))*(self.grid.oddGrid['flux'][x, y] - self.memoryGrid.oddGrid['flux'][x, y])
@@ -64,9 +64,9 @@ class solver:
 
             # calc even Grid
             for x in range(0, xshape, 1):
-                for y in range(0, yshape-1, 1):
+                for y in range(1, yshape, 1):
                     # calc flux density
-                    self.grid.evenGridX['flux'][x, y] -= c2*(self.grid.oddGrid['field'][x, y+1] - self.grid.oddGrid['field'][x, y])
+                    self.grid.evenGridX['flux'][x, y] -= c2*(self.grid.oddGrid['field'][x, y] - self.grid.oddGrid['field'][x, y-1])
 
                     # calc field
                     self.grid.evenGridX['field'][x, y] = (1.0/(c4*m3[x, y] + m5[x, y]))*(self.grid.evenGridX['flux'][x, y] - self.memoryGrid.evenGridX['flux'][x, y])
@@ -74,10 +74,10 @@ class solver:
                     # integrate field
                     self.memoryGrid.evenGridX['flux'][x, y] += m5[x, y]*self.grid.evenGridX['field'][x, y]
 
-            for x in range(0, xshape-1, 1):
+            for x in range(1, xshape, 1):
                 for y in range(0, yshape, 1):
                     # calc flux density
-                    self.grid.evenGridY['flux'][x, y] += c1*(self.grid.oddGrid['field'][x+1, y] - self.grid.oddGrid['field'][x, y])
+                    self.grid.evenGridY['flux'][x, y] += c1*(self.grid.oddGrid['field'][x, y] - self.grid.oddGrid['field'][x-1, y])
 
                     # calc field
                     self.grid.evenGridY['field'][x, y] = (1.0/(c4*m4[x, y] + m6[x, y]))*(self.grid.evenGridY['flux'][x, y] - self.memoryGrid.evenGridY['flux'][x, y])
