@@ -1,4 +1,5 @@
 import numpy
+import math
 import scipy.interpolate
 import matplotlib.pyplot as plt
 import fdtd
@@ -20,10 +21,8 @@ for i in range(1, 5, 1):
 
 # add source port
 def f(t):
-    if t == 0.0:
-        return 1.0
-    else:
-        return 0.0
+    x = t - 300e-12
+    return math.exp(-x**2/(2.0*50e-12**2))*math.cos(2.0*math.pi*40e9*x)
 
 portlist.append(fdtd.port( (0.025, 0.025), f))
 
