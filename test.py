@@ -7,7 +7,7 @@ import fdtd
 # create listen ports
 portlist = []
 for i in range(1, 5, 1):
-    portlist.append(fdtd.port( (i*0.01, 0.0) ))
+    portlist.append(fdtd.port( (i*0.01, 0.025) ))
 
 # add source port
 def f(t):
@@ -20,10 +20,21 @@ portlist.append(fdtd.port( (0.025, 0.025), f))
 solver = fdtd.solver(fdtd.grid(0.05, 0.05, 0.001, 0.001), fdtd.material(0.05, 0.05, 0.001, 0.001), 
     ports=portlist)
 
+# create material
+epsilon = numpy.zeros((50, 50))
+epsilon = epsilon + 4.0
+print epsilon
+
+solver.material['epsilon'] = epsilon
+
 # iterate
-solver.iterate(1.0e-12, 350e-12)
+solver.iterate(1.0e-12, 1000e-12)
 
 # plot ports
 plt.figure(1)
-plt.imshow(solver.grid.oddGrid['flux'])
+
+for port in portlist:
+    plt.subplot(len(portlist), 1, portlist.index(port)+1)
+    plt.plot(port.values)
+
 plt.show()
