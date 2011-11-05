@@ -29,8 +29,8 @@ class solver:
             m2 = self.material.oddGrid['sigma']
             m3 = self.material.evenGridX['mu']
             m4 = self.material.evenGridY['mu']
-            m5 = numpy.zeros(self.material.oddGrid['sigma'].shape)
-            m6 = numpy.zeros(self.material.oddGrid['sigma'].shape)
+            m5 = numpy.zeros(self.material.evenGridX['sigma'].shape)
+            m6 = numpy.zeros(self.material.evenGridY['sigma'].shape)
         elif self.mode == 'TEz':
             c1, c2, c3, c4 = -c1, -c2, c4, c3
             m1 = self.material.oddGrid['mu']
@@ -43,47 +43,44 @@ class solver:
             raise ArgumentError
 
         # iterate
-        for t in numpy.arange(starttime, time, deltaT):
+        for t in numpy.arange(starttime, starttime + time, deltaT):
             # update ports
             for port in self.ports:
                 port.update(self.grid, t)
 
             # calc odd Grid
             xshape, yshape = self.grid.oddGrid['field'].shape
-            for x in range(0, xshape, 1):
-                for y in range(0, yshape, 1):
+            for x in range(1, xshape-1, 1):
+                for y in range(1, yshape-1, 1):
                     # calc flux density
                     self.grid.oddGrid['flux'][x, y] += c1*(self.grid.evenGridY['field'][x+1, y] - self.grid.evenGridY['field'][x, y]) 
                     self.grid.oddGrid['flux'][x, y] -= c2*(self.grid.evenGridX['field'][x, y+1] - self.grid.evenGridX['field'][x, y])
-
-                    # calc field
-                    self.grid.oddGrid['field'][x, y] = (1.0/(c3*m1[x, y] + m2[x, y]))*(self.grid.oddGrid['flux'][x, y] - self.memoryGrid.oddGrid['flux'][x, y])
-
-                    # integrate field
-                    self.memoryGrid.oddGrid['flux'][x, y] += m2[x, y]*self.grid.oddGrid['field'][x, y]
+                    
+            # calc field
+            self.grid.oddGrid['field'] = (1.0/(c3*m1 + m2))*(self.grid.oddGrid['flux'] - self.memoryGrid.oddGrid['flux'])
+            # integrate field
+            self.memoryGrid.oddGrid['flux'] += m2*self.grid.oddGrid['field']
 
             # calc even Grid
             for x in range(0, xshape, 1):
-                for y in range(1, yshape, 1):
+                for y in range(1, yshape-1, 1):
                     # calc flux density
                     self.grid.evenGridX['flux'][x, y] -= c2*(self.grid.oddGrid['field'][x, y] - self.grid.oddGrid['field'][x, y-1])
 
-                    # calc field
-                    self.grid.evenGridX['field'][x, y] = (1.0/(c4*m3[x, y] + m5[x, y]))*(self.grid.evenGridX['flux'][x, y] - self.memoryGrid.evenGridX['flux'][x, y])
+            # calc field
+            self.grid.evenGridX['field'] = (1.0/(c4*m3 + m5))*(self.grid.evenGridX['flux'] - self.memoryGrid.evenGridX['flux'])
+            # integrate field
+            self.memoryGrid.evenGridX['flux'] += m5*self.grid.evenGridX['field']
 
-                    # integrate field
-                    self.memoryGrid.evenGridX['flux'][x, y] += m5[x, y]*self.grid.evenGridX['field'][x, y]
-
-            for x in range(1, xshape, 1):
+            for x in range(1, xshape-1, 1):
                 for y in range(0, yshape, 1):
                     # calc flux density
                     self.grid.evenGridY['flux'][x, y] += c1*(self.grid.oddGrid['field'][x, y] - self.grid.oddGrid['field'][x-1, y])
 
-                    # calc field
-                    self.grid.evenGridY['field'][x, y] = (1.0/(c4*m4[x, y] + m6[x, y]))*(self.grid.evenGridY['flux'][x, y] - self.memoryGrid.evenGridY['flux'][x, y])
-
-                    # integrate field
-                    self.memoryGrid.evenGridY['flux'][x, y] += m6[x, y]*self.grid.evenGridY['field'][x, y]
+            # calc field
+            self.grid.evenGridY['field'] = (1.0/(c4*m4 + m6))*(self.grid.evenGridY['flux'] - self.memoryGrid.evenGridY['flux'])
+            # integrate field
+            self.memoryGrid.evenGridY['flux'] += m6*self.grid.evenGridY['field']
 
             if t/deltaT % 100 == 0:
                 print "{}%".format((t-starttime)*100/time)

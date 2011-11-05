@@ -21,13 +21,9 @@ solver = fdtd.solver(fdtd.grid(0.05, 0.05, 0.001, 0.001), fdtd.material(0.05, 0.
     ports=portlist)
 
 # iterate
-solver.iterate(1.0e-12, 1000.0e-12)
+solver.iterate(1.0e-12, 350e-12)
 
 # plot ports
 plt.figure(1)
-
-for port in solver.ports:
-    plt.subplot(len(solver.ports), 1, solver.ports.index(port)+1)
-    plt.plot(port.values)
-
+plt.imshow(solver.grid.oddGrid['flux'])
 plt.show()
