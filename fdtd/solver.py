@@ -46,8 +46,8 @@ class solver:
 
             # calc odd Grid
             xshape, yshape = self.grid.oddGrid['field'].shape
-            for x in range(1, xshape-1, 1):
-                for y in range(1, yshape-1, 1):
+            for x in range(0, xshape-1, 1):
+                for y in range(0, yshape-1, 1):
                     # calc flux density
                     self.grid.oddGrid['flux'][x, y] += c1*(self.grid.evenGridY['field'][x+1, y] - self.grid.evenGridY['field'][x, y]) 
                     self.grid.oddGrid['flux'][x, y] -= c2*(self.grid.evenGridX['field'][x, y+1] - self.grid.evenGridX['field'][x, y])
@@ -58,7 +58,7 @@ class solver:
             self.memoryGrid.oddGrid['flux'] += m3*self.grid.oddGrid['field']*deltaT
 
             # calc even Grid
-            for x in range(0, xshape, 1):
+            for x in range(0, xshape-1, 1):
                 for y in range(1, yshape-1, 1):
                     # calc flux density
                     self.grid.evenGridX['flux'][x, y] -= c2*(self.grid.oddGrid['field'][x, y] - self.grid.oddGrid['field'][x, y-1])
@@ -69,7 +69,7 @@ class solver:
             self.memoryGrid.evenGridX['flux'] += m4*self.grid.evenGridX['field']*deltaT
 
             for x in range(1, xshape-1, 1):
-                for y in range(0, yshape, 1):
+                for y in range(0, yshape-1, 1):
                     # calc flux density
                     self.grid.evenGridY['flux'][x, y] += c1*(self.grid.oddGrid['field'][x, y] - self.grid.oddGrid['field'][x-1, y])
 
