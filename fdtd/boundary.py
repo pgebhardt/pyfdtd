@@ -23,17 +23,17 @@ class PML:
         sigmaMaxX = -(3.0 + 1.0)*math.sqrt(constants.permit/constants.permea)*math.log(1.0e-8)/(2.0*deltaX*thickness)
         sigmaMaxY = -(3.0 + 1.0)*math.sqrt(constants.permit/constants.permea)*math.log(1.0e-8)/(2.0*deltaY*thickness)
 
-        for n in range(0, int(thickness+1), 1):
+        for n in range(0, int(thickness), 1):
             for j in range(0, int(yShape), 1):
                 self.material['sigmaOddX'][n, j] = sigmaMaxY*math.pow((thickness-n)/thickness, 3.0)*c1
-                self.material['sigmaEvenX'][n, j] = sigmaMaxY*math.pow((thickness-n-0.5)/thickness, 3.0)*c2
+                self.material['sigmaEvenX'][n, j] = sigmaMaxY*math.pow((thickness-n+0.5)/thickness, 3.0)*c2
 
                 self.material['sigmaOddX'][xShape-1-n, j] = sigmaMaxY*math.pow((thickness-n)/thickness, 3.0)*c1
                 self.material['sigmaEvenX'][xShape-1-n, j] = sigmaMaxY*math.pow((thickness-n+0.5)/thickness, 3.0)*c2
 
             for i in range(0, int(xShape), 1):
                 self.material['sigmaOddY'][i, n] = sigmaMaxX*math.pow((thickness-n)/thickness, 3.0)*c1
-                self.material['sigmaEvenY'][i, n] = sigmaMaxX*math.pow((thickness-n-0.5)/thickness, 3.0)*c2
+                self.material['sigmaEvenY'][i, n] = sigmaMaxX*math.pow((thickness-n+0.5)/thickness, 3.0)*c2
 
                 self.material['sigmaOddY'][i, yShape-1-n] = sigmaMaxX*math.pow((thickness-n)/thickness, 3.0)*c1
                 self.material['sigmaEvenY'][i, yShape-1-n] = sigmaMaxX*math.pow((thickness-n+0.5)/thickness, 3.0)*c2
@@ -52,17 +52,17 @@ class PML:
 
         # apply boundary condition
         xShape, yShape = field.oddFieldX['field'].shape
-        for i in range(0, yShape, 1):
+        for i in range(0, yShape-1, 1):
             field.oddFieldX['field'][0, i] = 0.0
             field.oddFieldY['field'][0, i] = 0.0
-            field.oddFieldX['field'][xShape-1, i] = 0.0
-            field.oddFieldY['field'][xShape-1, i] = 0.0
+            field.oddFieldX['field'][xShape-2, i] = 0.0
+            field.oddFieldY['field'][xShape-2, i] = 0.0
 
-        for i in range(0, xShape, 1):
+        for i in range(0, xShape-1, 1):
             field.oddFieldX['field'][i, 0] = 0.0
             field.oddFieldY['field'][i, 0] = 0.0
-            field.oddFieldX['field'][i, yShape-1] = 0.0
-            field.oddFieldY['field'][i, yShape-1] = 0.0
+            field.oddFieldX['field'][i, yShape-2] = 0.0
+            field.oddFieldY['field'][i, yShape-2] = 0.0
 
     def apply_even(self, field, deltaT):
         # calc oddGrid

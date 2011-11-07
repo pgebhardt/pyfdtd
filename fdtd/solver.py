@@ -44,25 +44,42 @@ class solver:
 
             # calc odd Field
             xshape, yshape = self.field.oddFieldX['field'].shape
-            for x in range(1, xshape, 1):
-                for y in range(1, yshape, 1):
+            for x in range(0, xshape-1, 1):
+                for y in range(0, yshape-1, 1):
                     # calc flux density
-                    self.field.oddFieldX['flux'][x, y] += c1*(self.field.evenFieldY['field'][x, y] - self.field.evenFieldY['field'][x-1, y]) 
-                    self.field.oddFieldY['flux'][x, y] -= c2*(self.field.evenFieldX['field'][x, y] - self.field.evenFieldX['field'][x, y-1])
-            
+                    self.field.oddFieldX['flux'][x, y] += c1*(self.field.evenFieldY['field'][x+1, y] - self.field.evenFieldY['field'][x, y]) 
+                    self.field.oddFieldY['flux'][x, y] -= c2*(self.field.evenFieldX['field'][x, y+1] - self.field.evenFieldX['field'][x, y])
+                    
+            # calc field
+            self.field.oddFieldX['field'] = (1.0/(c3*m1 + m3))*(self.field.oddFieldX['flux'] - self.memoryField.oddFieldX['flux']*deltaT)
+            self.field.oddFieldY['field'] = (1.0/(c3*m1 + m3))*(self.field.oddFieldY['flux'] - self.memoryField.oddFieldY['flux']*deltaT)
+            # integrate field
+            self.memoryField.oddFieldX['flux'] += m3*self.field.oddFieldX['field']*deltaT
+            self.memoryField.oddFieldY['flux'] += m3*self.field.oddFieldY['field']*deltaT
+
             # apply PML
             self.pml.apply_odd(self.field, deltaT)
 
             # calc even Field
-            for x in range(0, xshape, 1):
+            for x in range(0, xshape-1, 1):
+                for y in range(1, yshape-1, 1):
+                    # calc flux density
+                    self.field.evenFieldX['flux'][x, y] -= c2*(self.field.oddFieldX['field'][x, y] + self.field.oddFieldY['field'][x, y] - self.field.oddFieldX['field'][x, y-1] - self.field.oddFieldY['field'][x, y-1])
+
+            # calc field
+            self.field.evenFieldX['field'] = (1.0/(c4*m2 + m4))*(self.field.evenFieldX['flux'] - self.memoryField.evenFieldX['flux']*deltaT)
+            # integrate field
+            self.memoryField.evenFieldX['flux'] += m4*self.field.evenFieldX['field']*deltaT
+
+            for x in range(1, xshape-1, 1):
                 for y in range(0, yshape-1, 1):
                     # calc flux density
-                    self.field.evenFieldX['flux'][x, y] -= c2*(self.field.oddFieldX['field'][x, y+1] + self.field.oddFieldY['field'][x, y+1] - self.field.oddFieldX['field'][x, y] - self.field.oddFieldY['field'][x, y])
+                    self.field.evenFieldY['flux'][x, y] += c1*(self.field.oddFieldX['field'][x, y] + self.field.oddFieldY['field'][x, y] - self.field.oddFieldX['field'][x-1, y] - self.field.oddFieldY['field'][x-1, y])
 
-            for x in range(0, xshape-1, 1):
-                for y in range(0, yshape, 1):
-                    # calc flux density
-                    self.field.evenFieldY['flux'][x, y] += c1*(self.field.oddFieldX['field'][x+1, y] + self.field.oddFieldY['field'][x+1, y] - self.field.oddFieldX['field'][x, y] - self.field.oddFieldY['field'][x, y])
+            # calc field
+            self.field.evenFieldY['field'] = (1.0/(c4*m2 + m4))*(self.field.evenFieldY['flux'] - self.memoryField.evenFieldY['flux']*deltaT)
+            # integrate field
+            self.memoryField.evenFieldY['flux'] += m4*self.field.evenFieldY['field']*deltaT
 
             # apply PML
             self.pml.apply_even(self.field, deltaT)
