@@ -1,5 +1,5 @@
 from constants import constants
-from field import field
+from grid import grid
 from material import material
 from port import port
 from solver import solver

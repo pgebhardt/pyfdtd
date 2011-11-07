@@ -15,7 +15,7 @@ def f(t):
 portlist.append(fdtd.port( (0.025, 0.025), f))
 
 # create solver
-solver = fdtd.solver(fdtd.grid(0.05, 0.05, 0.001, 0.001), ports=portlist)
+solver = fdtd.solver(fdtd.field(0.05, 0.05, 0.001, 0.001), ports=portlist)
 
 # create material
 epsilon = numpy.ones((50, 50))
@@ -36,6 +36,6 @@ plt.subplot(2, 1, 1)
 plt.plot(portlist[0].values)
 
 plt.subplot(2, 1, 2)
-plt.imshow(solver.grid.oddGrid['flux'])
+plt.imshow(solver.field.oddFieldX['flux'] + solver.field.oddFieldY['flux'])
 
 plt.show()
