@@ -28,4 +28,5 @@ class port:
                 raise AttributeError('mode')
 
         # get result value
-        self.values.append([field.oddFieldX['flux'][x, y]] + field.oddFieldY['flux'][x, y])
+        value = field.oddFieldX['flux'][x, y] + field.oddFieldY['flux'][x, y]
+        self.values.append(value)

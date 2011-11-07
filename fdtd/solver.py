@@ -1,6 +1,7 @@
 import numpy
 from constants import constants
 from material import material
+from boundary import PML
 import field as fi
 
 class solver:
@@ -10,15 +11,11 @@ class solver:
         self.field = field
         self.mode = mode
         self.ports = ports
+        self.material = material(field.xSize, field.ySize, field.deltaX, field.deltaY)
+        self.pml = PML(field.xSize, field.ySize, field.deltaX, field.deltaY, mode=self.mode)
 
         # create memory field
         self.memoryField = fi.field(self.field.xSize, self.field.ySize, self.field.deltaX, self.field.deltaY)
-        
-        # create material
-        self.material = {}
-        self.material['epsilon'] = numpy.ones((field.xSize/field.deltaX, field.ySize/field.deltaY))
-        self.material['mu'] = numpy.ones((field.xSize/field.deltaX, field.ySize/field.deltaY))
-        self.material['sigma'] = numpy.zeros((field.xSize/field.deltaX, field.ySize/field.deltaY))
 
     def iterate(self, deltaT, time, starttime=0.0):
         """Iterates the FDTD algorithm in respect of the pre-defined ports"""
@@ -29,10 +26,11 @@ class solver:
         c4 = constants.permea
 
         # shortcut materials
-        m1 = self.material['epsilon']
-        m2 = self.material['mu']
-        m3 = self.material['sigma']
-        m4 = numpy.zeros(self.material['sigma'].shape)
+        mat = self.material.get_material()
+        m1 = mat['epsilon']
+        m2 = mat['mu']
+        m3 = mat['sigma']
+        m4 = numpy.zeros(mat['sigma'].shape)
 
         if self.mode == 'TEz':
             c1, c2, c3, c4 = -c1, -c2, c4, c3
@@ -53,11 +51,14 @@ class solver:
                     self.field.oddFieldY['flux'][x, y] -= c2*(self.field.evenFieldX['field'][x, y+1] - self.field.evenFieldX['field'][x, y])
                     
             # calc field
-            self.field.oddFieldX['field'] = (1.0/(c3*m1 + m3))*(self.field.oddFieldX['flux'] - self.memoryField.oddFieldX['flux'])
-            self.field.oddFieldY['field'] = (1.0/(c3*m1 + m3))*(self.field.oddFieldY['flux'] - self.memoryField.oddFieldY['flux'])
+            self.field.oddFieldX['field'] = (1.0/(c3*m1 + m3))*(self.field.oddFieldX['flux'] - self.memoryField.oddFieldX['flux']*deltaT)
+            self.field.oddFieldY['field'] = (1.0/(c3*m1 + m3))*(self.field.oddFieldY['flux'] - self.memoryField.oddFieldY['flux']*deltaT)
             # integrate field
             self.memoryField.oddFieldX['flux'] += m3*self.field.oddFieldX['field']*deltaT
             self.memoryField.oddFieldY['flux'] += m3*self.field.oddFieldY['field']*deltaT
+
+            # apply PML
+            self.pml.apply_odd(self.field, deltaT)
 
             # calc even Field
             for x in range(0, xshape-1, 1):
@@ -66,7 +67,7 @@ class solver:
                     self.field.evenFieldX['flux'][x, y] -= c2*(self.field.oddFieldX['field'][x, y] + self.field.oddFieldY['field'][x, y] - self.field.oddFieldX['field'][x, y-1] - self.field.oddFieldY['field'][x, y-1])
 
             # calc field
-            self.field.evenFieldX['field'] = (1.0/(c4*m2 + m4))*(self.field.evenFieldX['flux'] - self.memoryField.evenFieldX['flux'])
+            self.field.evenFieldX['field'] = (1.0/(c4*m2 + m4))*(self.field.evenFieldX['flux'] - self.memoryField.evenFieldX['flux']*deltaT)
             # integrate field
             self.memoryField.evenFieldX['flux'] += m4*self.field.evenFieldX['field']*deltaT
 
@@ -76,9 +77,12 @@ class solver:
                     self.field.evenFieldY['flux'][x, y] += c1*(self.field.oddFieldX['field'][x, y] + self.field.oddFieldY['field'][x, y] - self.field.oddFieldX['field'][x-1, y] - self.field.oddFieldY['field'][x-1, y])
 
             # calc field
-            self.field.evenFieldY['field'] = (1.0/(c4*m2 + m4))*(self.field.evenFieldY['flux'] - self.memoryField.evenFieldY['flux'])
+            self.field.evenFieldY['field'] = (1.0/(c4*m2 + m4))*(self.field.evenFieldY['flux'] - self.memoryField.evenFieldY['flux']*deltaT)
             # integrate field
             self.memoryField.evenFieldY['flux'] += m4*self.field.evenFieldY['field']*deltaT
+
+            # apply PML
+            self.pml.apply_even(self.field, deltaT)
 
             if t/deltaT % 100 == 0:
                 print "{}%".format((t-starttime)*100/time)

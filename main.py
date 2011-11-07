@@ -1,11 +1,15 @@
 import math
 import numpy
+import numpy.ma
 import scipy.interpolate
 import matplotlib.pyplot as plt
 import fdtd
 
 # create listen ports
 portlist = []
+
+for i in range(0, 2, 1):
+    portlist.append(fdtd.port((0.02 + i*0.01, 0.02)))
 
 # add source port
 def f(t):
@@ -15,27 +19,24 @@ def f(t):
 portlist.append(fdtd.port( (0.025, 0.025), f))
 
 # create solver
-solver = fdtd.solver(fdtd.field(0.05, 0.05, 0.001, 0.001), ports=portlist)
-
-# create material
-epsilon = numpy.ones((50, 50))
-
-for x in range(40, 50, 1):
-    for y in range(20, 30, 1):
-        epsilon[x, y] = 10.0
-
-# solver.material['epsilon'] = epsilon
+solver = fdtd.solver(fdtd.field(0.05, 0.05, 0.0005, 0.0005), ports=portlist)
 
 # iterate
-solver.iterate(1.0e-12, 500e-12)
+solver.iterate(1.0e-12, 1000e-12)
 
 # plot ports
 plt.figure(1)
 
-plt.subplot(2, 1, 1)
-plt.plot(portlist[0].values)
+#for i in range(0, 3, 1):
+#    plt.subplot(4, 1, i+1)
+#    plt.title = portlist[i].position
+#    plt.plot(portlist[i].values)
 
-plt.subplot(2, 1, 2)
-plt.imshow(solver.field.oddFieldX['flux'] + solver.field.oddFieldY['flux'])
+#plt.subplot(4, 1, 4)
+
+mask = numpy.zeros((100, 100))
+
+a = solver.field.oddFieldX['flux'] + solver.field.oddFieldY['flux']
+plt.imshow(a)
 
 plt.show()
