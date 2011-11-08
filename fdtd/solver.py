@@ -1,4 +1,5 @@
 import numpy
+import scipy.weave
 from constants import constants
 from material import material
 from boundary import PML
@@ -17,13 +18,21 @@ class solver:
     def iterate(self, deltaT, time, starttime=0.0):
         """Iterates the FDTD algorithm in respect of the pre-defined ports"""
         # create constants
-        c1 = deltaT/self.field.deltaX
-        c2 = deltaT/self.field.deltaY
-        c3 = constants.permit
-        c4 = constants.permea
+        kx = deltaT/self.field.deltaX
+        ky = deltaT/self.field.deltaY
 
         if self.mode == 'TEz':
-            c1, c2, c3, c4 = -c1, -c2, c4, c3
+            kx, ky, = -ky, -ky
+
+        # shortcut fields
+        a = self.field.oddFieldX['flux']
+        b = self.field.oddFieldY['flux']
+        c = self.field.oddFieldX['field']
+        d = self.field.oddFieldY['field']
+        e = self.field.evenFieldX['flux']
+        f = self.field.evenFieldY['flux']
+        g = self.field.evenFieldX['field']
+        h = self.field.evenFieldY['field']
 
         # iterate
         for t in numpy.arange(starttime, starttime + time, deltaT):
@@ -31,13 +40,9 @@ class solver:
             for port in self.ports:
                 port.update(self.field, t)
 
-            # calc odd Field
-            xshape, yshape = self.field.oddFieldX['field'].shape
-            for x in range(1, xshape, 1):
-                for y in range(1, yshape, 1):
-                    # calc flux density
-                    self.field.oddFieldX['flux'][x, y] += c1*(self.field.evenFieldY['field'][x, y] - self.field.evenFieldY['field'][x-1, y]) 
-                    self.field.oddFieldY['flux'][x, y] -= c2*(self.field.evenFieldX['field'][x, y] - self.field.evenFieldX['field'][x, y-1])
+            # calc oddField
+            self.field.oddFieldX['flux'][1:,1:] += ky*(self.field.evenFieldY['field'][1:,1:] - self.field.evenFieldY['field'][:-1,1:])
+            self.field.oddFieldY['flux'][1:,1:] -= ky*(self.field.evenFieldX['field'][1:,1:] - self.field.evenFieldX['field'][1:,:-1])
                     
             # calc field
             self.material.apply_odd(self.field, deltaT)
@@ -46,15 +51,8 @@ class solver:
             self.pml.apply_odd(self.field, deltaT)
 
             # calc even Field
-            for x in range(0, xshape, 1):
-                for y in range(0, yshape-1, 1):
-                    # calc flux density
-                    self.field.evenFieldX['flux'][x, y] -= c2*(self.field.oddFieldX['field'][x, y+1] + self.field.oddFieldY['field'][x, y+1] - self.field.oddFieldX['field'][x, y] - self.field.oddFieldY['field'][x, y])
-
-            for x in range(0, xshape-1, 1):
-                for y in range(0, yshape, 1):
-                    # calc flux density
-                    self.field.evenFieldY['flux'][x, y] += c1*(self.field.oddFieldX['field'][x+1, y] + self.field.oddFieldY['field'][x+1, y] - self.field.oddFieldX['field'][x, y] - self.field.oddFieldY['field'][x, y])
+            self.field.evenFieldX['flux'][:,:-1] -= ky*(self.field.oddFieldX['field'][:,1:] + self.field.oddFieldY['field'][:,1:] - self.field.oddFieldX['field'][:,:-1] - self.field.oddFieldY['field'][:,:-1])
+            self.field.evenFieldY['flux'][:-1,:] += kx*(self.field.oddFieldX['field'][1:,:] + self.field.oddFieldY['field'][1:,:] - self.field.oddFieldX['field'][:-1,:] - self.field.oddFieldY['field'][:-1,:])
 
             # calc field
             self.material.apply_even(self.field, deltaT)
