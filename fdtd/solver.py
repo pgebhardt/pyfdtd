@@ -13,26 +13,7 @@ class solver:
         self.mode = mode
         self.ports = ports
         self.material = material(field.xSize, field.ySize, field.deltaX, field.deltaY, mode=self.mode)
-        self.pml = PML(field.xSize, field.ySize, field.deltaX, field.deltaY, mode=self.mode)
-
-    def iterate(self, deltaT, time, starttime=0.0):
-        """Iterates the FDTD algorithm in respect of the pre-defined ports"""
-        # create constants
-        kx = deltaT/self.field.deltaX
-        ky = deltaT/self.field.deltaY
-
-        if self.mode == 'TEz':
-            kx, ky, = -ky, -ky
-
-        # shortcut fields
-        a = self.field.oddFieldX['flux']
-        b = self.field.oddFieldY['flux']
-        c = self.field.oddFieldX['field']
-        d = self.field.oddFieldY['field']
-        e = self.field.evenFieldX['flux']
-        f = self.field.evenFieldY['flux']
-        g = self.field.evenFieldX['field']
-        h = self.field.evenFieldY['field']
+        self.pml = PML(field.xSize, fi
 
         # iterate
         for t in numpy.arange(starttime, starttime + time, deltaT):
