@@ -15,6 +15,15 @@ class solver:
         self.material = material(field.xSize, field.ySize, field.deltaX, field.deltaY, mode=self.mode)
         self.pml = PML(field.xSize, fi
 
+    def iterate(self, deltaT, time, starttime=0.0):
+        """Iterates the FDTD algorithm in respect of the pre-defined ports"""
+        # create constants
+        kx = deltaT/self.field.deltaX
+        ky = deltaT/self.field.deltaY
+
+        if self.mode == 'TEz':
+            kx, ky, = -ky, -ky
+            
         # iterate
         for t in numpy.arange(starttime, starttime + time, deltaT):
             # update ports
