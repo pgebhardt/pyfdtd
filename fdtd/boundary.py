@@ -23,20 +23,20 @@ class PML:
         sigmaMaxX = -(3.0 + 1.0)*math.sqrt(constants.permit/constants.permea)*math.log(1.0e-8)/(2.0*deltaX*thickness)
         sigmaMaxY = -(3.0 + 1.0)*math.sqrt(constants.permit/constants.permea)*math.log(1.0e-8)/(2.0*deltaY*thickness)
 
-        for n in range(0, int(thickness), 1):
+        for n in range(0, int(thickness+1.0), 1):
             for j in range(0, int(yShape), 1):
-                self.material['sigmaOddY'][n, j] = sigmaMaxY*math.pow((thickness-n)/thickness, 3.0)*c1
-                self.material['sigmaEvenY'][n, j] = sigmaMaxY*math.pow((thickness-n+0.5)/thickness, 3.0)*c2
+                self.material['sigmaOddX'][n, j] = sigmaMaxY*math.pow((thickness-n)/thickness, 3.0)*c1
+                self.material['sigmaEvenX'][n, j] = sigmaMaxY*math.pow((thickness-n-0.5)/thickness, 3.0)*c2
 
-                self.material['sigmaOddY'][xShape-2-n, j] = sigmaMaxY*math.pow((thickness-n)/thickness, 3.0)*c1
-                self.material['sigmaEvenY'][xShape-1-n, j] = sigmaMaxY*math.pow((thickness-n+0.5)/thickness, 3.0)*c2
+                self.material['sigmaOddX'][xShape-1-n, j] = sigmaMaxY*math.pow((thickness-n)/thickness, 3.0)*c1
+                self.material['sigmaEvenX'][xShape-1-n, j] = sigmaMaxY*math.pow((thickness-n+0.5)/thickness, 3.0)*c2
 
             for i in range(0, int(xShape), 1):
-                self.material['sigmaOddX'][i, n] = sigmaMaxX*math.pow((thickness-n)/thickness, 3.0)*c1
-                self.material['sigmaEvenX'][i, n] = sigmaMaxX*math.pow((thickness-n+0.5)/thickness, 3.0)*c2
+                self.material['sigmaOddY'][i, n] = sigmaMaxX*math.pow((thickness-n)/thickness, 3.0)*c1
+                self.material['sigmaEvenY'][i, n] = sigmaMaxX*math.pow((thickness-n-0.5)/thickness, 3.0)*c2
 
-                self.material['sigmaOddX'][i, yShape-2-n] = sigmaMaxX*math.pow((thickness-n)/thickness, 3.0)*c1
-                self.material['sigmaEvenX'][i, yShape-1-n] = sigmaMaxX*math.pow((thickness-n+0.5)/thickness, 3.0)*c2
+                self.material['sigmaOddY'][i, yShape-1-n] = sigmaMaxX*math.pow((thickness-n)/thickness, 3.0)*c1
+                self.material['sigmaEvenY'][i, yShape-1-n] = sigmaMaxX*math.pow((thickness-n+0.5)/thickness, 3.0)*c2
 
     def apply_odd(self, field, deltaT):
         # calc oddGrid

@@ -22,7 +22,7 @@ portlist.append(fdtd.port( (0.025, 0.025), f))
 solver = fdtd.solver(fdtd.field(0.05, 0.05, 0.0005, 0.0005), ports=portlist)
 
 # iterate
-solver.iterate(1.0e-12, 500e-12)
+solver.iterate(1.0e-12, 1000e-12)
 
 # plot ports
 plt.figure(1)
