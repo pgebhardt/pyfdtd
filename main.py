@@ -7,8 +7,6 @@ import matplotlib.animation as animation
 import matplotlib.colors as colors
 import fdtd
 
-fig = plt.figure(1)
-
 # create listen ports
 portlist = []
 
@@ -22,7 +20,7 @@ def f(t):
     else:
         return math.exp(-(x-600e-12)**2/(2.0*50.0e-12**2))*math.cos(2.0*math.pi*40e9*x)
     
-portlist.append(fdtd.port( (0.1, 0.1), f))
+portlist.append(fdtd.port((0.1, 0.1), function=f))
 
 # create solver
 solver = fdtd.solver(fdtd.field(0.20, 0.20, 0.0005, 0.0005), ports=portlist)
@@ -37,10 +35,15 @@ for i in range(0, 320, 1):
 solver.material.add_layer(layer)
 
 # iterate
-ims = []
-
 history = solver.iterate(2000e-12, safeHistory=True, historyInterval=5e-12)
 
+# show plot
+fig = plt.figure(1)
+plt.subplot(2, 1, 1)
+plt.plot(portlist[0].values)
+
+plt.subplot(2, 1, 2)
+ims = []
 for f in history:
     im = plt.imshow(f, norm=colors.Normalize(-0.05, 0.05))
     ims.append([im])

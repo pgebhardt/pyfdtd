@@ -21,7 +21,6 @@ class solver:
         # calc deltaT
         if deltaT == 0.0:
             deltaT = 1.0/(constants.c0*math.sqrt(1.0/self.field.deltaX**2 + 1.0/self.field.deltaY**2))
-            print deltaT
 
         # create history memory
         history = []
@@ -44,7 +43,7 @@ class solver:
             # calc oddField
             self.field.oddFieldX['flux'][1:,1:] += ky*(self.field.evenFieldY['field'][1:,1:] - self.field.evenFieldY['field'][:-1,1:])
             self.field.oddFieldY['flux'][1:,1:] -= ky*(self.field.evenFieldX['field'][1:,1:] - self.field.evenFieldX['field'][1:,:-1])
-                    
+             
             # calc field
             self.material.apply_odd(self.field, deltaT)
 
