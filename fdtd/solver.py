@@ -15,15 +15,20 @@ class solver:
         self.material = material(field.xSize, field.ySize, field.deltaX, field.deltaY, mode=self.mode, borderThickness=20.0)
         self.pml = PML(field.xSize, field.ySize, field.deltaX, field.deltaY, thickness=20.0)
 
-    def iterate(self, deltaT, time, starttime=0.0):
+    def iterate(self, deltaT, time, starttime=0.0, safeHistory=False, historyInterval=0.0):
         """Iterates the FDTD algorithm in respect of the pre-defined ports"""
+        # create history memory
+        history = []
+        if safeHistory and historyInterval == 0.0:
+            historyInterval = deltaT
+
         # create constants
         kx = deltaT/self.field.deltaX
         ky = deltaT/self.field.deltaY
 
         if self.mode == 'TEz':
             kx, ky, = -ky, -ky
-            
+
         # iterate
         for t in numpy.arange(starttime, starttime + time, deltaT):
             # update ports
@@ -50,5 +55,13 @@ class solver:
             # apply PML
             self.pml.apply_even(self.field, deltaT)
 
-            if t/deltaT % 100 == 0:
-                print "{}%".format((t-starttime)*100/time)
+            # safe Field
+            if safeHistory and t/deltaT % (historyInterval/deltaT) < 1.0:
+                history.append(self.field.oddFieldX['field'] + self.field.oddFieldY['field'])
+
+            # print progression
+            if t/deltaT % 100 < 1.0:
+                print '{}%'.format((t-starttime)*100/time)
+
+        # return history
+        return history

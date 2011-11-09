@@ -23,7 +23,6 @@ class PML:
         # init PML
         sigmaMaxX = -(3.0 + 1.0)*constants.e0*constants.c0*math.log(1.0e-8)/(2.0*deltaX*thickness)
         sigmaMaxY = -(3.0 + 1.0)*constants.e0*constants.c0*math.log(1.0e-8)/(2.0*deltaY*thickness)
-        print sigmaMaxX*c1, sigmaMaxX*c2
 
         for n in range(0, int(thickness+1.0), 1):
             for j in range(0, int(yShape), 1):

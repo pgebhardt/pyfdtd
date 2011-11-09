@@ -28,21 +28,24 @@ portlist.append(fdtd.port( (0.1, 0.1), f))
 solver = fdtd.solver(fdtd.field(0.20, 0.20, 0.0005, 0.0005), ports=portlist)
 
 # add material
-#layer = solver.material.empty_layer()
+layer = solver.material.empty_layer()
 
-#for i in range(0, 20, 1):
-#    for j in range(0, 20, 1):
-#        layer['epsilon'][40+i, 360+j] = 8.0
+for i in range(0, 20, 1):
+    for j in range(0, 20, 1):
+        layer['epsilon'][40+i, 360+j] = 8.0
 
-#solver.material.add_layer(layer)
+solver.material.add_layer(layer)
 
 # iterate
 ims = []
-for i in range(0, 400, 1):
-    solver.iterate(1.0e-12, 5e-12, i*5e-12)
-    im = plt.imshow(solver.field.oddFieldX['field'] + solver.field.oddFieldY['field'], norm=colors.Normalize(-0.05, 0.05))
+
+history = solver.iterate(1.0e-12, 2000e-12, safeHistory=True, historyInterval=5e-12)
+
+for f in history:
+    im = plt.imshow(f, norm=colors.Normalize(-0.05, 0.05))
     ims.append([im])
 
 ani = animation.ArtistAnimation(fig, ims, interval=50)
+
 
 plt.show()
