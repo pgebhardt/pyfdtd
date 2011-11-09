@@ -1,3 +1,4 @@
+import math
 import numpy
 import scipy.weave
 from constants import constants
@@ -15,8 +16,13 @@ class solver:
         self.material = material(field.xSize, field.ySize, field.deltaX, field.deltaY, mode=self.mode, borderThickness=20.0)
         self.pml = PML(field.xSize, field.ySize, field.deltaX, field.deltaY, thickness=20.0)
 
-    def iterate(self, deltaT, time, starttime=0.0, safeHistory=False, historyInterval=0.0):
+    def iterate(self, duration, starttime=0.0, deltaT=0.0, safeHistory=False, historyInterval=0.0):
         """Iterates the FDTD algorithm in respect of the pre-defined ports"""
+        # calc deltaT
+        if deltaT == 0.0:
+            deltaT = 1.0/(constants.c0*math.sqrt(1.0/self.field.deltaX**2 + 1.0/self.field.deltaY**2))
+            print deltaT
+
         # create history memory
         history = []
         if safeHistory and historyInterval == 0.0:
@@ -30,7 +36,7 @@ class solver:
             kx, ky, = -ky, -ky
 
         # iterate
-        for t in numpy.arange(starttime, starttime + time, deltaT):
+        for t in numpy.arange(starttime, starttime + duration, deltaT):
             # update ports
             for port in self.ports:
                 port.update(self.field, t)
@@ -61,7 +67,7 @@ class solver:
 
             # print progression
             if t/deltaT % 100 < 1.0:
-                print '{}%'.format((t-starttime)*100/time)
+                print '{}%'.format((t-starttime)*100/duration)
 
         # return history
         return history

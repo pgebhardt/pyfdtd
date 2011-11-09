@@ -30,22 +30,21 @@ solver = fdtd.solver(fdtd.field(0.20, 0.20, 0.0005, 0.0005), ports=portlist)
 # add material
 layer = solver.material.empty_layer()
 
-for i in range(0, 20, 1):
+for i in range(0, 320, 1):
     for j in range(0, 20, 1):
-        layer['epsilon'][40+i, 360+j] = 8.0
+        layer['sigma'][40+i, 360+j] = 59.1e6
 
 solver.material.add_layer(layer)
 
 # iterate
 ims = []
 
-history = solver.iterate(1.0e-12, 2000e-12, safeHistory=True, historyInterval=5e-12)
+history = solver.iterate(2000e-12, safeHistory=True, historyInterval=5e-12)
 
 for f in history:
     im = plt.imshow(f, norm=colors.Normalize(-0.05, 0.05))
     ims.append([im])
 
 ani = animation.ArtistAnimation(fig, ims, interval=50)
-
 
 plt.show()
