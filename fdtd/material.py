@@ -25,7 +25,8 @@ class material:
 
     def empty_layer(self):
         """Returns an empty layer to work on"""
-        return self.material.copy()
+        result = { 'epsilon': self.material['epsilon'].copy(), 'mu': self.material['mu'].copy(), 'sigma': self.material['sigma'].copy() }
+        return result
 
     def add_layer(self, layer):
         """Add new layer to material"""
