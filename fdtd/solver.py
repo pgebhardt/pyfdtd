@@ -12,8 +12,8 @@ class solver:
         self.field = field
         self.mode = mode
         self.ports = ports
-        self.material = material(field.xSize, field.ySize, field.deltaX, field.deltaY, mode=self.mode)
-        self.pml = PML(field.xSize, fi
+        self.material = material(field.xSize, field.ySize, field.deltaX, field.deltaY, mode=self.mode, borderThickness=20.0)
+        self.pml = PML(field.xSize, field.ySize, field.deltaX, field.deltaY, thickness=20.0)
 
     def iterate(self, deltaT, time, starttime=0.0):
         """Iterates the FDTD algorithm in respect of the pre-defined ports"""

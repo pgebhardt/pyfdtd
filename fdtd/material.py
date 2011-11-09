@@ -48,12 +48,12 @@ class material:
     def apply_odd(self, field, deltaT):
         """Calculate field for oddField"""
         # switch mode
-        c1 = constants.permit
+        c1 = constants.e0
         m1 = self.material['epsilon']
         m2 = self.material['sigma']
 
         if self.mode == 'TEz':
-            c1 = constants.permea
+            c1 = constants.u0
             m1 = self.material['mu']
             m2 = numpy.zeros(self.material['sigma'].shape)
 
@@ -66,12 +66,12 @@ class material:
     def apply_even(self, field, deltaT):
         """Calculate field for evenField"""
         # switch mode
-        c1 = constants.permea
+        c1 = constants.u0
         m1 = self.material['mu']
         m2 = numpy.zeros(self.material['sigma'].shape)
 
         if self.mode == 'TEz':
-            c1 = constants.permit
+            c1 = constants.e0
             m1 = self.material['epsilon']
             m2 = self.material['sigma']
 

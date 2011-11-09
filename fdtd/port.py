@@ -20,11 +20,11 @@ class port:
             f = self.function(t)
                  
             if mode == 'TMz':
-                field.oddFieldX['flux'][x, y] += 0.5*constants.permit*f
-                field.oddFieldY['flux'][x, y] += 0.5*constants.permit*f
+                field.oddFieldX['flux'][x, y] += 0.5*constants.e0*f
+                field.oddFieldY['flux'][x, y] += 0.5*constants.e0*f
             elif mode == 'TEz':
-                field.oddFieldX['flux'][x, y] += 0.5*constants.permea*f
-                field.oddFieldY['flux'][x, y] += 0.5*constants.permea*f
+                field.oddFieldX['flux'][x, y] += 0.5*constants.u0*f
+                field.oddFieldY['flux'][x, y] += 0.5*constants.u0*f
             else:
                 raise AttributeError('mode')
 

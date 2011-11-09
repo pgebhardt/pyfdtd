@@ -3,7 +3,11 @@ import numpy
 import numpy.ma
 import scipy.interpolate
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+import matplotlib.colors as colors
 import fdtd
+
+fig = plt.figure(1)
 
 # create listen ports
 portlist = []
@@ -18,32 +22,27 @@ def f(t):
     else:
         return math.exp(-(x-600e-12)**2/(2.0*50.0e-12**2))*math.cos(2.0*math.pi*40e9*x)
     
-portlist.append(fdtd.port( (0.025, 0.01), f))
+portlist.append(fdtd.port( (0.1, 0.1), f))
 
 # create solver
-solver = fdtd.solver(fdtd.field(0.05, 0.20, 0.0005, 0.0005), ports=portlist)
+solver = fdtd.solver(fdtd.field(0.20, 0.20, 0.0005, 0.0005), ports=portlist)
 
 # add material
-layer = solver.material.empty_layer()
+#layer = solver.material.empty_layer()
 
-for i in range(0, 20, 1):
-    for j in range(0, 20, 1):
-        layer['epsilon'][40+i, 360+j] = 8.0
+#for i in range(0, 20, 1):
+#    for j in range(0, 20, 1):
+#        layer['epsilon'][40+i, 360+j] = 8.0
 
-solver.material.add_layer(layer)
+#solver.material.add_layer(layer)
 
 # iterate
-solver.iterate(1.0e-12, 2000e-12)
+ims = []
+for i in range(0, 400, 1):
+    solver.iterate(1.0e-12, 5e-12, i*5e-12)
+    im = plt.imshow(solver.field.oddFieldX['field'] + solver.field.oddFieldY['field'], norm=colors.Normalize(-0.05, 0.05))
+    ims.append([im])
 
-# plot ports
-plt.figure(1)
-
-for port in portlist:
-    plt.subplot(len(portlist)+1, 1, portlist.index(port)+1)
-    plt.plot(port.values)
-
-plt.subplot(len(portlist)+1, 1, len(portlist)+1)
-
-plt.imshow(solver.field.oddFieldX['field'] + solver.field.oddFieldY['field'])
+ani = animation.ArtistAnimation(fig, ims, interval=50)
 
 plt.show()
