@@ -11,23 +11,18 @@ class port:
         self.messureWave = messureWave
         self.values = []
 
-    def update(self, field, t=0.0, mode='TMz'):
+    def update(self, field, deltaT, S, t=0.0):
         """Updates data port and connected grid"""
         x, y = self.position
         x, y = int(x/field.deltaX), int(y/field.deltaY)
     
-        # check mode
-        c = constants.e0
-        if mode == 'TEz':
-            c = constants.u0
+        # get result value
+        value = field.oddFieldX['field'][x, y] + field.oddFieldY['field'][x, y] + 1.075350807*self.function(t-0.64*deltaT)
+        self.values.append(value)
 
         # apply function
         f = 0.0
         if self.function:
-            f = self.function(t)                 
-            field.oddFieldX['flux'][x, y] += 0.5*c*f
-            field.oddFieldY['flux'][x, y] += 0.5*c*f
-
-        # get result value
-        value = field.oddFieldX['field'][x, y] + field.oddFieldY['field'][x, y]
-        self.values.append(value)
+            f = 2.0*S*self.function(t-0.5*deltaT)
+            field.oddFieldX['field'][x, y] += 0.5*f
+            field.oddFieldY['field'][x, y] += 0.5*f

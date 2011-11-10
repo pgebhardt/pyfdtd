@@ -36,6 +36,7 @@ solver.material.add_layer(layer)
 
 # iterate
 history = solver.iterate(2000e-12, safeHistory=True, historyInterval=5e-12)
+print max(portlist[0].values)
 
 # show plot
 fig = plt.figure(1)
@@ -45,7 +46,7 @@ plt.plot(portlist[0].values)
 plt.subplot(2, 1, 2)
 ims = []
 for f in history:
-    im = plt.imshow(f, norm=colors.Normalize(-0.05, 0.05))
+    im = plt.imshow(f, norm=colors.Normalize(-0.01, 0.01))
     ims.append([im])
 
 ani = animation.ArtistAnimation(fig, ims, interval=50)

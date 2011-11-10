@@ -30,16 +30,13 @@ class solver:
         # create constants
         kx = deltaT/self.field.deltaX
         ky = deltaT/self.field.deltaY
+        S = constants.c0*deltaT/math.sqrt(self.field.deltaX**2 + self.field.deltaY**2)
 
         if self.mode == 'TEz':
             kx, ky, = -ky, -ky
 
         # iterate
         for t in numpy.arange(starttime, starttime + duration, deltaT):
-            # update ports
-            for port in self.ports:
-                port.update(self.field, t)
-
             # calc oddField
             self.field.oddFieldX['flux'][1:,1:] += ky*(self.field.evenFieldY['field'][1:,1:] - self.field.evenFieldY['field'][:-1,1:])
             self.field.oddFieldY['flux'][1:,1:] -= ky*(self.field.evenFieldX['field'][1:,1:] - self.field.evenFieldX['field'][1:,:-1])
@@ -49,6 +46,10 @@ class solver:
 
             # apply PML
             self.pml.apply_odd(self.field, deltaT)
+
+            # update ports
+            for port in self.ports:
+                port.update(self.field, deltaT, S, t)
 
             # calc even Field
             self.field.evenFieldX['flux'][:,:-1] -= ky*(self.field.oddFieldX['field'][:,1:] + self.field.oddFieldY['field'][:,1:] - self.field.oddFieldX['field'][:,:-1] - self.field.oddFieldY['field'][:,:-1])
