@@ -1,7 +1,5 @@
 import math
 import numpy
-import numpy.ma
-import scipy.interpolate
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.colors as colors
