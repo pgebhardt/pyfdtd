@@ -1,20 +1,17 @@
-.. PyFDTD documentation master file, created by
-   sphinx-quickstart on Mon Nov 14 10:12:00 2011.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
+=========================================
 Welcome to PyFDTD's documentation!
-==================================
+=========================================
 
-Contents:
+PyFDTD is an easy to use 2 dimensional FDTD_ solver in cartesian coordinates using numpy_
+
+.. _FDTD: http://en.wikipedia.org/wiki/Finite-difference_time-domain_method
+.. _numpy: http://numpy.scipy.org/
+
+Contents
+========
 
 .. toctree::
    :maxdepth: 2
 
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+   tutorial
+   reference

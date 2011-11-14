@@ -21,7 +21,7 @@ def f(t):
 portlist.append(fdtd.port((0.1, 0.1), function=f))
 
 # create solver
-solver = fdtd.solver(fdtd.field(0.20, 0.20, 0.0005, 0.0005), ports=portlist)
+solver = fdtd.solver(fdtd.field(0.20, 0.20, deltaX=0.0005), ports=portlist)
 
 # add material
 layer = solver.material.empty_layer()
