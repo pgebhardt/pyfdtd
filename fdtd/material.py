@@ -4,7 +4,7 @@ import field as fi
 
 class material:
     """Descripes the material"""
-    def __init__(self, xSize, ySize, deltaX, deltaY, borderThickness=8.0, mode='TMz'):
+    def __init__(self, xSize, ySize, deltaX, deltaY, mode='TMz'):
         # init layer
         xShape = xSize/deltaX
         yShape = ySize/deltaY
@@ -12,13 +12,6 @@ class material:
 
         # create memoryField
         self.memoryField = fi.field(xSize, ySize, deltaX, deltaY)
-
-        # create mask
-        self.mask = numpy.ones((xShape, yShape))
-        for i in range(0, int(xShape), 1):
-            for j in range(0, int(yShape), 1):
-                if i <= borderThickness or j <= borderThickness or i >= xShape - borderThickness - 1 or j >= yShape - borderThickness - 1:
-                    self.mask[i, j] = 0.0
 
         # save atributes
         self.mode = mode
@@ -58,11 +51,8 @@ class material:
             m1 = self.material['mu']
             m2 = numpy.zeros(self.material['sigma'].shape)
 
-        field.oddFieldX['field'] = (1.0/(c1*m1 + m2*deltaT))*(field.oddFieldX['flux'] - self.memoryField.oddFieldX['flux'])*self.mask + (1.0-self.mask)*field.oddFieldX['field']
-        field.oddFieldY['field'] = (1.0/(c1*m1 + m2*deltaT))*(field.oddFieldY['flux'] - self.memoryField.oddFieldY['flux'])*self.mask + (1.0-self.mask)*field.oddFieldY['field']
-
-        self.memoryField.oddFieldX['flux'] += m2*field.oddFieldX['field']*deltaT*self.mask
-        self.memoryField.oddFieldY['flux'] += m2*field.oddFieldY['field']*deltaT*self.mask
+        field.oddFieldX['field'] = (1.0/(c1*m1 + m2*deltaT))*(field.oddFieldX['flux'] - self.memoryField.oddFieldX['flux'])
+        field.oddFieldY['field'] = (1.0/(c1*m1 + m2*deltaT))*(field.oddFieldY['flux'] - self.memoryField.oddFieldY['flux'])
 
     def apply_even(self, field, deltaT):
         """Calculate field for evenField"""
@@ -76,8 +66,5 @@ class material:
             m1 = self.material['epsilon']
             m2 = self.material['sigma']
 
-        field.evenFieldX['field'] = (1.0/(c1*m1 + m2*deltaT))*(field.evenFieldX['flux'] - self.memoryField.evenFieldX['flux'])*self.mask + (1.0-self.mask)*field.evenFieldX['field']
-        field.evenFieldY['field'] = (1.0/(c1*m1 + m2*deltaT))*(field.evenFieldY['flux'] - self.memoryField.evenFieldY['flux'])*self.mask + (1.0-self.mask)*field.evenFieldY['field']
-
-        self.memoryField.evenFieldX['flux'] += m2*field.evenFieldX['field']*deltaT*self.mask
-        self.memoryField.evenFieldY['flux'] += m2*field.evenFieldY['field']*deltaT*self.mask
+        field.evenFieldX['field'] = (1.0/(c1*m1 + m2*deltaT))*(field.evenFieldX['flux'] - self.memoryField.evenFieldX['flux'])
+        field.evenFieldY['field'] = (1.0/(c1*m1 + m2*deltaT))*(field.evenFieldY['flux'] - self.memoryField.evenFieldY['flux'])
