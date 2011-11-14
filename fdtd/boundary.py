@@ -8,6 +8,7 @@ class PML:
     def __init__(self, xSize, ySize, deltaX, deltaY, thickness=8.0, mode='TMz'):
         # init
         self.mode = mode
+        self.thickness = thickness
         self.memoryField = fi.field(xSize, ySize, deltaX, deltaY)
 
         # crate material

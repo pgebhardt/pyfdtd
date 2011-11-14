@@ -38,33 +38,37 @@ class solver:
 
         # iterate
         for t in numpy.arange(starttime, starttime + duration, deltaT):
-            # calc oddField
-            self.field.oddFieldX['flux'][1:,1:] += kx*(self.field.evenFieldY['field'][1:,1:] - self.field.evenFieldY['field'][:-1,1:])
-            self.field.oddFieldY['flux'][1:,1:] -= ky*(self.field.evenFieldX['field'][1:,1:] - self.field.evenFieldX['field'][1:,:-1])
-             
-            # apply material and PML
-            self.material.apply_odd(self.field, deltaT)
-            self.pml.apply_odd(self.field, deltaT)
+            # do step
+            self._step(deltaT, t, kx, ky)
 
-            # update ports
-            for port in self.ports:
-                port.update(self.field, t)
-
-            # calc evenField
-            self.field.evenFieldX['flux'][:,:-1] -= ky*(self.field.oddFieldX['field'][:,1:] + self.field.oddFieldY['field'][:,1:] - self.field.oddFieldX['field'][:,:-1] - self.field.oddFieldY['field'][:,:-1])
-            self.field.evenFieldY['flux'][:-1,:] += kx*(self.field.oddFieldX['field'][1:,:] + self.field.oddFieldY['field'][1:,:] - self.field.oddFieldX['field'][:-1,:] - self.field.oddFieldY['field'][:-1,:])
-
-            # apply material and PML
-            self.material.apply_even(self.field, deltaT)
-            self.pml.apply_even(self.field, deltaT)
-
-            # safe History
+            #safe History
             if safeHistory and t/deltaT % (historyInterval/deltaT) < 1.0:
                 history.append(self.field.oddFieldX['field'] + self.field.oddFieldY['field'])
 
-            # print progression
+            # print progession
             if t/deltaT % 100 < 1.0:
                 print '{}%'.format((t-starttime)*100/duration)
 
         # return history
         return history
+
+    def _step(self, deltaT, t, kx, ky):
+        # calc oddField
+        self.field.oddFieldX['flux'][1:,1:] += kx*(self.field.evenFieldY['field'][1:,1:] - self.field.evenFieldY['field'][:-1,1:])
+        self.field.oddFieldY['flux'][1:,1:] -= ky*(self.field.evenFieldX['field'][1:,1:] - self.field.evenFieldX['field'][1:,:-1])
+         
+        # apply material and PML
+        self.material.apply_odd(self.field, deltaT)
+        self.pml.apply_odd(self.field, deltaT)
+
+        # update ports
+        for port in self.ports:
+            port.update(self.field, t)
+
+        # calc evenField
+        self.field.evenFieldX['flux'][:,:-1] -= ky*(self.field.oddFieldX['field'][:,1:] + self.field.oddFieldY['field'][:,1:] - self.field.oddFieldX['field'][:,:-1] - self.field.oddFieldY['field'][:,:-1])
+        self.field.evenFieldY['flux'][:-1,:] += kx*(self.field.oddFieldX['field'][1:,:] + self.field.oddFieldY['field'][1:,:] - self.field.oddFieldX['field'][:-1,:] - self.field.oddFieldY['field'][:-1,:])
+
+        # apply material and PML
+        self.material.apply_even(self.field, deltaT)
+        self.pml.apply_even(self.field, deltaT)
