@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # PyFDTD documentation build configuration file, created by
-# sphinx-quickstart on Mon Nov 14 10:12:00 2011.
+# sphinx-quickstart on Mon Nov 14 17:15:52 2011.
 #
 # This file is execfile()d with the current directory set to its containing dir.
 #
@@ -17,7 +17,6 @@ import sys, os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
-sys.path.append(os.path.abspath('../'))
 
 # -- General configuration -----------------------------------------------------
 
