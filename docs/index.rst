@@ -1,8 +1,8 @@
 =========================================
-Welcome to PyFDTD's documentation!
+Welcome to pyfdtd's documentation!
 =========================================
 
-PyFDTD is an easy to use 2 dimensional FDTD_ solver in cartesian coordinates using numpy_
+pyfdtd is an easy to use 2 dimensional FDTD_ solver in cartesian coordinates using numpy_
 
 .. _FDTD: http://en.wikipedia.org/wiki/Finite-difference_time-domain_method
 .. _numpy: http://numpy.scipy.org/
