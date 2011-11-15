@@ -46,6 +46,42 @@
             
   <div class="section" id="reference">
 <h1>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="field">
+<h2>Field<a class="headerlink" href="#field" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="fdtd.field">
+<em class="property">class </em><tt class="descclassname">fdtd.</tt><tt class="descname">field</tt><big>(</big><em>xSize</em>, <em>ySize</em>, <em>deltaX</em>, <em>deltaY=None</em><big>)</big><a class="headerlink" href="#fdtd.field" title="Permalink to this definition">¶</a></dt>
+<dd><p>Defines the calculation domain</p>
+<dl class="method">
+<dt id="fdtd.field.__init__">
+<tt class="descname">__init__</tt><big>(</big><em>xSize</em>, <em>ySize</em>, <em>deltaX</em>, <em>deltaY=None</em><big>)</big><a class="headerlink" href="#fdtd.field.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates am new field with given size and discretization</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fdtd.field.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#fdtd.field.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the field vector at the given location</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="port">
+<h2>Port<a class="headerlink" href="#port" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="fdtd.port">
+<em class="property">class </em><tt class="descclassname">fdtd.</tt><tt class="descname">port</tt><big>(</big><em>position</em>, <em>function=None</em><big>)</big><a class="headerlink" href="#fdtd.port" title="Permalink to this definition">¶</a></dt>
+<dd><p>I/O Port to connect Grids to outer world</p>
+<dl class="method">
+<dt id="fdtd.port.update">
+<tt class="descname">update</tt><big>(</big><em>field</em>, <em>t=0.0</em><big>)</big><a class="headerlink" href="#fdtd.port.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates data port and connected grid</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="solver">
 <h2>Solver<a class="headerlink" href="#solver" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -79,6 +115,39 @@
 <dd><p>Set material at given location</p>
 </dd></dl>
 
+<dl class="method">
+<dt id="fdtd.material.apply_odd">
+<tt class="descname">apply_odd</tt><big>(</big><em>field</em>, <em>deltaT</em><big>)</big><a class="headerlink" href="#fdtd.material.apply_odd" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate field for oddField</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fdtd.material.apply_even">
+<tt class="descname">apply_even</tt><big>(</big><em>field</em>, <em>deltaT</em><big>)</big><a class="headerlink" href="#fdtd.material.apply_even" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate field for evenField</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="pml">
+<h2>PML<a class="headerlink" href="#pml" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="fdtd.pml">
+<em class="property">class </em><tt class="descclassname">fdtd.</tt><tt class="descname">pml</tt><big>(</big><em>xSize</em>, <em>ySize</em>, <em>deltaX</em>, <em>deltaY</em>, <em>thickness=8.0</em>, <em>mode='TMz'</em><big>)</big><a class="headerlink" href="#fdtd.pml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Applies a perfectly matched layer as surounding boundary conditions</p>
+<dl class="method">
+<dt id="fdtd.pml.apply_odd">
+<tt class="descname">apply_odd</tt><big>(</big><em>field</em>, <em>deltaT</em><big>)</big><a class="headerlink" href="#fdtd.pml.apply_odd" title="Permalink to this definition">¶</a></dt>
+<dd><p>applies pml for odd field components</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fdtd.pml.apply_even">
+<tt class="descname">apply_even</tt><big>(</big><em>field</em>, <em>deltaT</em><big>)</big><a class="headerlink" href="#fdtd.pml.apply_even" title="Permalink to this definition">¶</a></dt>
+<dd><p>applies pml for even field components</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -93,8 +162,11 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">Reference</a><ul>
+<li><a class="reference internal" href="#field">Field</a></li>
+<li><a class="reference internal" href="#port">Port</a></li>
 <li><a class="reference internal" href="#solver">Solver</a></li>
 <li><a class="reference internal" href="#material">Material</a></li>
+<li><a class="reference internal" href="#pml">PML</a></li>
 </ul>
 </li>
 </ul>
