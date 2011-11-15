@@ -46,7 +46,7 @@ Define material
 ===============
 
 Defining some material constants is done with slicing. Pyfdtd defines 'epsilon', 'mu' and 'sigma'
-material constants. To define e.g. a 10cm x 1cm block of coper in our domain we just have to adjust
+material constants. To define e.g. a 10cm x 10cm block of coper in our domain we just have to adjust
 the sigma parameter::
 
    material = solver.material

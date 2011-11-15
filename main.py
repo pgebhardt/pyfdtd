@@ -16,20 +16,23 @@ def f(t):
 portlist.append(fdtd.port((0.1, 0.1), function=f))
 
 # create solver
-solver = fdtd.solver(fdtd.field(0.2, 1.0, deltaX=0.001), ports=portlist)
+solver = fdtd.solver(fdtd.field(0.2, 0.6, deltaX=0.001), ports=portlist)
 
 # add material
-solver.material['sigma',0.05:0.15,0.30:0.4] = 59.1e6
+solver.material['sigma',0.05:0.15,0.5:0.6] = 59.1e6
+solver.material['sigma',:,0.05:0.07] = 59.1e6
+solver.material['sigma',0.05:0.07,0.05:0.15] = 59.1e6
+solver.material['sigma',0.13:0.15,0.05:0.15] = 59.1e6
 
 # iterate
 history = solver.solve(10e-9, safeHistory=True)
 
 # show plot
 fig = plt.figure(1)
-plt.subplot(2, 1, 1)
-plt.plot(portlist[0].values)
+#plt.subplot(2, 1, 1)
+#plt.plot(portlist[0].values)
 
-plt.subplot(2, 1, 2)
+#plt.subplot(2, 1, 2)
 ims = []
 for f in history:
     im = plt.imshow(f, norm=colors.Normalize(-0.01, 0.01))
