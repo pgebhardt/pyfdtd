@@ -25,7 +25,7 @@ import sys, os
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc']
+extensions = ['sphinx.ext.autodoc', 'sphinxtogithub']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['.templates']
@@ -40,7 +40,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'PyFDTD'
+project = u'pyfdtd'
 copyright = u'2011, Patrik Gebhardt'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -164,7 +164,7 @@ html_static_path = ['.static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'PyFDTDdoc'
+htmlhelp_basename = 'pyfdtddoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -178,7 +178,7 @@ htmlhelp_basename = 'PyFDTDdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'PyFDTD.tex', u'PyFDTD Documentation',
+  ('index', 'pyfdtd.tex', u'pyfdtd Documentation',
    u'Patrik Gebhardt', 'manual'),
 ]
 
@@ -211,6 +211,6 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'pyfdtd', u'PyFDTD Documentation',
+    ('index', 'pyfdtd', u'pyfdtd Documentation',
      [u'Patrik Gebhardt'], 1)
 ]
