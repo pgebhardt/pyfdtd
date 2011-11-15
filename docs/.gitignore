@@ -1,4 +1,1 @@
-.build/
-.static/
-.template/
-src/
+./*
