@@ -72,17 +72,17 @@ qthelp:
 	@echo
 	@echo "Build finished; now you can run "qcollectiongenerator" with the" \
 	      ".qhcp project file in $(BUILDDIR)/qthelp, like this:"
-	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/PyFDTD.qhcp"
+	@echo "# qcollectiongenerator $(BUILDDIR)/qthelp/pyfdtd.qhcp"
 	@echo "To view the help file:"
-	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/PyFDTD.qhc"
+	@echo "# assistant -collectionFile $(BUILDDIR)/qthelp/pyfdtd.qhc"
 
 devhelp:
 	$(SPHINXBUILD) -b devhelp $(ALLSPHINXOPTS) $(BUILDDIR)/devhelp
 	@echo
 	@echo "Build finished."
 	@echo "To view the help file:"
-	@echo "# mkdir -p $$HOME/.local/share/devhelp/PyFDTD"
-	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/PyFDTD"
+	@echo "# mkdir -p $$HOME/.local/share/devhelp/pyfdtd"
+	@echo "# ln -s $(BUILDDIR)/devhelp $$HOME/.local/share/devhelp/pyfdtd"
 	@echo "# devhelp"
 
 epub:
