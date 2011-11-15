@@ -21,6 +21,10 @@ class field:
         self.xSize = xSize
         self.ySize = ySize
 
-    def get_field(self, x, y, key='field'):
+    def __getitem__(self, key):
         """Returns the field vector at the given location"""
-        return self.evenFieldX[key][x, y], self.evenFieldY[key][x, y], self.oddGridX[key][x, y] + self.oddGridY[key][x, y]
+        # obtain parameter
+        x, y = key
+
+        # return field vector
+        return self.evenFieldX['field'][x, y], self.evenFieldY['field'][x, y], self.oddGridX['field'][x, y] + self.oddGridY['field'][x, y]

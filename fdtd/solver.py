@@ -2,7 +2,7 @@ import math
 import numpy
 from constants import constants
 from material import material
-from boundary import PML
+from pml import pml
 import field as fi
 
 class solver:
@@ -17,7 +17,7 @@ class solver:
         self.material = material(field.xSize, field.ySize, field.deltaX, field.deltaY, mode=self.mode)
 
         # create standart boundary
-        self.boundary = PML(field.xSize, field.ySize, field.deltaX, field.deltaY, thickness=20.0)
+        self.boundary = pml(field.xSize, field.ySize, field.deltaX, field.deltaY, thickness=20.0)
 
     def solve(self, duration, starttime=0.0, deltaT=0.0, safeHistory=False, maxHistoryMemory=256e6):
         """Iterates the FDTD algorithm in respect of the pre-defined ports"""
