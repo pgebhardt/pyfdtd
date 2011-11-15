@@ -54,3 +54,13 @@ the sigma parameter::
 
 Solving
 =======
+
+Now it is time to do some solving. Easiest way is to solve for a specific duration::
+
+   solver.solve(10e-9)
+
+This solves the equations for 10ns and of cause applies our specified source and
+saves the field information in our listener port. For example to plot the field
+at the listener port with matplotlib do as following::
+
+   pyplot.plot(listener.values)

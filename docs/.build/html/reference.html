@@ -48,10 +48,37 @@
 <h1>Reference<a class="headerlink" href="#reference" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="solver">
 <h2>Solver<a class="headerlink" href="#solver" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
+<dl class="class">
 <dt id="fdtd.solver">
-<tt class="descclassname">fdtd.</tt><tt class="descname">solver</tt><big>(</big><big>)</big><a class="headerlink" href="#fdtd.solver" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">fdtd.</tt><tt class="descname">solver</tt><big>(</big><em>field</em>, <em>mode='TMz'</em>, <em>ports=None</em>, <em>boundary=None</em><big>)</big><a class="headerlink" href="#fdtd.solver" title="Permalink to this definition">¶</a></dt>
 <dd><p>Solves FDTD equations on given field, with given materials and ports</p>
+<dl class="method">
+<dt id="fdtd.solver.solve">
+<tt class="descname">solve</tt><big>(</big><em>duration</em>, <em>starttime=0.0</em>, <em>deltaT=0.0</em>, <em>safeHistory=False</em>, <em>maxHistoryMemory=256000000.0</em><big>)</big><a class="headerlink" href="#fdtd.solver.solve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterates the FDTD algorithm in respect of the pre-defined ports</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="material">
+<h2>Material<a class="headerlink" href="#material" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="fdtd.material">
+<em class="property">class </em><tt class="descclassname">fdtd.</tt><tt class="descname">material</tt><big>(</big><em>xSize</em>, <em>ySize</em>, <em>deltaX</em>, <em>deltaY</em>, <em>mode='TMz'</em><big>)</big><a class="headerlink" href="#fdtd.material" title="Permalink to this definition">¶</a></dt>
+<dd><p>Descripes the material</p>
+<dl class="method">
+<dt id="fdtd.material.__getitem__">
+<tt class="descname">__getitem__</tt><big>(</big><em>key</em><big>)</big><a class="headerlink" href="#fdtd.material.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return material at given location</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="fdtd.material.__setitem__">
+<tt class="descname">__setitem__</tt><big>(</big><em>key</em>, <em>value</em><big>)</big><a class="headerlink" href="#fdtd.material.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set material at given location</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -67,6 +94,7 @@
   <ul>
 <li><a class="reference internal" href="#">Reference</a><ul>
 <li><a class="reference internal" href="#solver">Solver</a></li>
+<li><a class="reference internal" href="#material">Material</a></li>
 </ul>
 </li>
 </ul>

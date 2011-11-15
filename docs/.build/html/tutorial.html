@@ -101,6 +101,16 @@ the sigma parameter:</p>
 </div>
 <div class="section" id="solving">
 <h2>Solving<a class="headerlink" href="#solving" title="Permalink to this headline">¶</a></h2>
+<p>Now it is time to do some solving. Easiest way is to solve for a specific duration:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="mf">10e-9</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This solves the equations for 10ns and of cause applies our specified source and
+saves the field information in our listener port. For example to plot the field
+at the listener port with matplotlib do as following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">pyplot</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">listener</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+</pre></div>
+</div>
 </div>
 </div>
 
