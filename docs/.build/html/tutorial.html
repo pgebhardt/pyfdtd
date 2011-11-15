@@ -53,8 +53,8 @@
 <div class="section" id="creating-a-simple-fdtd">
 <h2>Creating a simple FDTD<a class="headerlink" href="#creating-a-simple-fdtd" title="Permalink to this headline">¶</a></h2>
 <p>Probably the first step in using an FDTD is to create the calculation domain.
-For an 0.2m x 0.2m domain with a discretization of 0.5mm it&#8217;s as simple as this:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">field</span> <span class="o">=</span> <span class="n">fdtd</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">deltaX</span><span class="o">=</span><span class="mf">0.0005</span><span class="p">)</span>
+For an 0.2m x 1.0m domain with a discretization of 1mm it&#8217;s as simple as this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">field</span> <span class="o">=</span> <span class="n">fdtd</span><span class="o">.</span><span class="n">field</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">deltaX</span><span class="o">=</span><span class="mf">0.001</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The second step is to initialize the solver:</p>
@@ -69,7 +69,7 @@ boundary condition, no listening or source ports and in TMz mode.</p>
 <p>To add a source to our domain we first need a function to discribe the field.
 In this example we use a sinoudial modulated gaussian pulse:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">source_function</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
-     <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">t</span><span class="o">-</span><span class="mf">300e-12</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="mf">50.0e-12</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mf">40e9</span><span class="o">*</span><span class="p">(</span><span class="n">t</span><span class="o">-</span><span class="mf">300e-12</span><span class="p">))</span>
+     <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">t</span><span class="o">-</span><span class="mf">300e-12</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="mf">200.0e-12</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mf">2.0</span><span class="o">*</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="mf">20e9</span><span class="o">*</span><span class="p">(</span><span class="n">t</span><span class="o">-</span><span class="mf">300e-12</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>After that we create a port using this sourcefunction in the middle of our domain
@@ -84,10 +84,23 @@ and add it to our solver:</p>
 <p>To have a look on what is happening in our calculation domain, we can either watch
 the field located at our source or we create a listening port. The only difference
 to a source port is the missing sourcefunction:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">listener</span> <span class="o">=</span> <span class="n">fdtd</span><span class="o">.</span><span class="n">port</span><span class="p">((</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">))</span>
-<span class="n">solber</span><span class="o">.</span><span class="n">ports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">listener</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">listener</span> <span class="o">=</span> <span class="n">fdtd</span><span class="o">.</span><span class="n">port</span><span class="p">((</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">))</span>
+<span class="n">solver</span><span class="o">.</span><span class="n">ports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">listener</span><span class="p">)</span>
 </pre></div>
 </div>
+</div>
+<div class="section" id="define-material">
+<h2>Define material<a class="headerlink" href="#define-material" title="Permalink to this headline">¶</a></h2>
+<p>Defining some material constants is done with slicing. Pyfdtd defines &#8216;epsilon&#8217;, &#8216;mu&#8217; and &#8216;sigma&#8217;
+material constants. To define e.g. a 10cm x 1cm block of coper in our domain we just have to adjust
+the sigma parameter:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">material</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">material</span>
+<span class="n">material</span><span class="p">[</span><span class="s">&#39;sigma&#39;</span><span class="p">,</span><span class="mf">0.05</span><span class="p">:</span><span class="mf">0.15</span><span class="p">,</span><span class="mf">0.3</span><span class="p">:</span><span class="mf">0.4</span><span class="p">]</span> <span class="o">=</span> <span class="mf">59.1e6</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="solving">
+<h2>Solving<a class="headerlink" href="#solving" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
@@ -103,6 +116,8 @@ to a source port is the missing sourcefunction:</p>
 <li><a class="reference internal" href="#creating-a-simple-fdtd">Creating a simple FDTD</a></li>
 <li><a class="reference internal" href="#adding-a-sources">Adding a sources</a></li>
 <li><a class="reference internal" href="#adding-a-listener">Adding a listener</a></li>
+<li><a class="reference internal" href="#define-material">Define material</a></li>
+<li><a class="reference internal" href="#solving">Solving</a></li>
 </ul>
 </li>
 </ul>

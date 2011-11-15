@@ -15,29 +15,44 @@ class material:
 
         # save atributes
         self.mode = mode
+        self.deltaX = deltaX
+        self.deltaY = deltaY
 
-    def empty_layer(self):
-        """Returns an empty layer to work on"""
-        result = { 'epsilon': self.material['epsilon'].copy(), 'mu': self.material['mu'].copy(), 'sigma': self.material['sigma'].copy() }
-        return result
+    def __getitem__(self, key):
+        """Return material at given location"""
+        # obtain parametes
+        mat, x, y = key
 
-    def add_layer(self, layer):
-        """Add new layer to material"""
-        #calc new material
-        xShape, yShape = layer['epsilon'].shape
-        for i in range(0, xShape, 1):
-            for j in range(0, yShape, 1):
-                # cumulate epsilon
-                if layer['epsilon'][i, j] != 1.0:
-                    self.material['epsilon'][i, j] = layer['epsilon'][i, j]
+        # scale slices
+        if x.start:
+            x = slice(int(x.start/self.deltaX), x.stop)
+        if x.stop:
+            x = slice(x.start, int(x.stop/self.deltaX))
+        if y.start:
+            y = slice(int(y.start/self.deltaY), y.stop)
+        if y.stop:
+            y = slice(y.start, int(y.stop/self.deltaY))
 
-                #cumulate mu
-                if layer['mu'][i, j] != 1.0:
-                    self.material['mu'][i, j] = layer['mu'][i, j]
+        # return material
+        return self.material[mat][x, y]
 
-                #cumulate sigma
-                if layer['sigma'][i, j] != 0.0:
-                    self.material['sigma'][i, j] = layer['sigma'][i, j]
+    def __setitem__(self, key, value):
+        """Set material at given location"""
+        # optain parameter
+        mat, x, y = key
+
+        # scale slices
+        if x.start:
+            x = slice(int(x.start/self.deltaX), x.stop)
+        if x.stop:
+            x = slice(x.start, int(x.stop/self.deltaX))
+        if y.start:
+            y = slice(int(y.start/self.deltaY), y.stop)
+        if y.stop:
+            y = slice(y.start, int(y.stop/self.deltaY))
+
+        # set material
+        self.material[mat][x, y] = value
 
     def apply_odd(self, field, deltaT):
         """Calculate field for oddField"""

@@ -16,15 +16,13 @@ def f(t):
 portlist.append(fdtd.port((0.1, 0.1), function=f))
 
 # create solver
-solver = fdtd.solver(fdtd.field(0.20, 0.40, deltaX=0.001), ports=portlist)
+solver = fdtd.solver(fdtd.field(0.2, 1.0, deltaX=0.001), ports=portlist)
 
 # add material
-layer = solver.material.empty_layer()
-layer['sigma'][:,360:] = 59.1e6
-solver.material.add_layer(layer)
+solver.material['sigma',0.05:0.15,0.30:0.4] = 59.1e6
 
 # iterate
-history = solver.iterate(3000e-12, safeHistory=True)
+history = solver.solve(10e-9, safeHistory=True)
 
 # show plot
 fig = plt.figure(1)

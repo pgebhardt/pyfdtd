@@ -7,15 +7,19 @@ import field as fi
 
 class solver:
     """Solves FDTD equations on given field, with given materials and ports"""
-    def __init__(self, field, mode='TMz', ports=None):
+    def __init__(self, field, mode='TMz', ports=None, boundary=None):
         # save arguments
         self.field = field
         self.mode = mode
         self.ports = ports
-        self.material = material(field.xSize, field.ySize, field.deltaX, field.deltaY, mode=self.mode)
-        self.pml = PML(field.xSize, field.ySize, field.deltaX, field.deltaY, thickness=20.0)
 
-    def iterate(self, duration, starttime=0.0, deltaT=0.0, safeHistory=False, historyInterval=None):
+        # create free space material
+        self.material = material(field.xSize, field.ySize, field.deltaX, field.deltaY, mode=self.mode)
+
+        # create standart boundary
+        self.boundary = PML(field.xSize, field.ySize, field.deltaX, field.deltaY, thickness=20.0)
+
+    def solve(self, duration, starttime=0.0, deltaT=0.0, safeHistory=False, maxHistoryMemory=256e6):
         """Iterates the FDTD algorithm in respect of the pre-defined ports"""
         # calc deltaT
         if deltaT == 0.0:
@@ -23,9 +27,9 @@ class solver:
 
         # create history memory
         history = []
-        if safeHistory and not historyInterval:
+        if safeHistory:
             xShape, yShape = self.field.oddFieldX['flux'].shape
-            historyInterval = xShape*yShape*duration/64e6
+            historyInterval = xShape*yShape*duration/(maxHistoryMemory/4.0)
 
         # create constants
         kx = deltaT/self.field.deltaX
@@ -59,7 +63,7 @@ class solver:
          
         # apply material and PML
         self.material.apply_odd(self.field, deltaT)
-        self.pml.apply_odd(self.field, deltaT)
+        self.boundary.apply_odd(self.field, deltaT)
 
         # update ports
         for port in self.ports:
@@ -71,4 +75,4 @@ class solver:
 
         # apply material and PML
         self.material.apply_even(self.field, deltaT)
-        self.pml.apply_even(self.field, deltaT)
+        self.boundary.apply_even(self.field, deltaT)
