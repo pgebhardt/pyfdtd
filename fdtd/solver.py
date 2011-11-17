@@ -19,7 +19,7 @@ class solver:
         # create standart boundary
         self.boundary = pml(field.xSize, field.ySize, field.deltaX, field.deltaY, thickness=20.0)
 
-    def solve(self, duration, starttime=0.0, deltaT=0.0, safeHistory=False, maxHistoryMemory=256e6):
+    def solve(self, duration, starttime=0.0, deltaT=0.0, saveHistory=False, maxHistoryMemory=256e6):
         """Iterates the FDTD algorithm in respect of the pre-defined ports"""
         # calc deltaT
         if deltaT == 0.0:
@@ -27,7 +27,7 @@ class solver:
 
         # create history memory
         history = []
-        if safeHistory:
+        if saveHistory:
             xShape, yShape = self.field.oddFieldX['flux'].shape
             historyInterval = xShape*yShape*duration/(maxHistoryMemory/4.0)
 
@@ -38,7 +38,7 @@ class solver:
 
         # apply mode
         if self.mode == 'TEz':
-            kx, ky, = -ky, -ky
+            kx, ky = -ky, -ky
 
         # iterate
         for t in numpy.arange(starttime, starttime + duration, deltaT):
@@ -46,7 +46,7 @@ class solver:
             self._step(deltaT, t, kx, ky)
 
             #safe History
-            if safeHistory and t/deltaT % (historyInterval/deltaT) < 1.0:
+            if saveHistory and t/deltaT % (historyInterval/deltaT) < 1.0:
                 history.append(self.field.oddFieldX['field'] + self.field.oddFieldY['field'])
 
             # print progession
