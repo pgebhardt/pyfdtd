@@ -2,9 +2,25 @@ import numpy
 import scipy.interpolate
 
 class field:
-    """Defines the calculation domain"""
+    """
+    Defines the calculation domain by creating even and odd yee grids
+    for field and flux.
+
+        **Arguments:**
+
+    xSize (required)
+        Size in x direction
+
+    ySize (required)
+        Size in y direction
+
+    deltaX (required)
+        Interval of discretization in x direction
+
+    deltaY
+        Interval if discretization in y direction. If not set, deltaX is used instead.
+    """
     def __init__(self, xSize, ySize, deltaX, deltaY=None):
-        """Creates am new field with given size and discretization"""
         # fill missing parameters
         if not deltaY:
             deltaY = deltaX
