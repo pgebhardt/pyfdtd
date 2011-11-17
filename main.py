@@ -3,7 +3,7 @@ import numpy
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.colors as colors
-import fdtd
+import pyfdtd
 
 # create listen ports
 portlist = []
@@ -13,11 +13,11 @@ def f(t):
     x = t - 1000e-12
     return math.exp(-x**2/(2.0*200.0e-12**2))*math.cos(2.0*math.pi*20e9*x)
     
-portlist.append(fdtd.port((0.08, 0.05), function=f))
-portlist.append(fdtd.port((0.12, 0.05), function=f)) 
+portlist.append(pyfdtd.port((0.08, 0.05), function=f))
+portlist.append(pyfdtd.port((0.12, 0.05), function=f)) 
 
 # create solver
-solver = fdtd.solver(fdtd.field(0.2, 0.6, deltaX=0.001), ports=portlist)
+solver = pyfdtd.solver(pyfdtd.field(0.2, 0.6, deltaX=0.001), ports=portlist)
 
 # add material
 solver.material['sigma',0.05:0.15,-0.03:-0.02] = 59.1e9
