@@ -7,7 +7,7 @@ import field as fi
 
 class solver:
     """Solves FDTD equations on given field, with given materials and ports"""
-    def __init__(self, field, mode='TMz', ports=None, boundary=None):
+    def __init__(self, field, mode='TMz', ports=[], boundary=None):
         # save arguments
         self.field = field
         self.mode = mode
