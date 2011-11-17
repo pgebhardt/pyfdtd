@@ -1,3 +1,4 @@
+from types import *
 import numpy
 from constants import constants
 import field as fi
@@ -17,6 +18,8 @@ class material:
         self.mode = mode
         self.deltaX = deltaX
         self.deltaY = deltaY
+        self.xSize = xSize
+        self.ySize = ySize
 
     def __getitem__(self, key):
         """Return material at given location"""
@@ -37,22 +40,29 @@ class material:
         return self.material[mat][x, y]
 
     def __setitem__(self, key, value):
-        """Set material at given location"""
-        # optain parameter
-        mat, x, y = key
+        """Set material either at given location or using a function"""
+        # A function value is obtained
+        if isinstance(value, FunctionType):
+            for x in numpy.arange(0.0, self.xSize, self.deltaX):
+                for y in numpy.arange(0.0, self.ySize, self.deltaY):
+                    self.material[key][int(x/self.deltaX), int(y/self.deltaY)] = value(x, y)
 
-        # scale slices
-        if x.start:
-            x = slice(int(x.start/self.deltaX), x.stop)
-        if x.stop:
-            x = slice(x.start, int(x.stop/self.deltaX))
-        if y.start:
-            y = slice(int(y.start/self.deltaY), y.stop)
-        if y.stop:
-            y = slice(y.start, int(y.stop/self.deltaY))
+        else:
+            # A value type is obtained
+            mat, x, y = key
 
-        # set material
-        self.material[mat][x, y] = value
+            # scale slices
+            if x.start:
+                x = slice(int(x.start/self.deltaX), x.stop)
+            if x.stop:
+                x = slice(x.start, int(x.stop/self.deltaX))
+            if y.start:
+                y = slice(int(y.start/self.deltaY), y.stop)
+            if y.stop:
+                y = slice(y.start, int(y.stop/self.deltaY))
+
+            # set material
+            self.material[mat][x, y] = value
 
     def apply_odd(self, field, deltaT):
         """Calculate field for oddField"""

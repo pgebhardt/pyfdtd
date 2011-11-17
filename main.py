@@ -12,21 +12,24 @@ portlist = []
 def f(t):
     x = t - 1000e-12
     return math.exp(-x**2/(2.0*200.0e-12**2))*math.cos(2.0*math.pi*20e9*x)
-    
-portlist.append(pyfdtd.port((0.08, 0.05), function=f))
-portlist.append(pyfdtd.port((0.12, 0.05), function=f)) 
+
+def mat(x, y):
+    if (x - 0.2)**2 + (y - 0.2)**2 > 0.1**2:
+        return 59.1e6
+
+    else:
+        return 0.0
+        
+portlist.append(pyfdtd.port((0.2, 0.2), function=f))
 
 # create solver
-solver = pyfdtd.solver(pyfdtd.field(0.2, 0.6, deltaX=0.001), ports=portlist)
+solver = pyfdtd.solver(pyfdtd.field(0.4, 0.4, deltaX=0.001), ports=portlist)
 
 # add material
-solver.material['sigma',0.05:0.15,-0.03:-0.02] = 59.1e9
-solver.material['sigma',0.05:0.15,0.02:0.03] = 59.1e6
-solver.material['sigma',0.05:0.07,0.02:-0.02] = 59.1e6
-solver.material['sigma',0.13:0.15,0.02:-0.02] = 59.1e6
+solver.material['sigma'] = mat
 
 # iterate
-history = solver.solve(15e-9, saveHistory=True)
+history = solver.solve(5e-9, saveHistory=True)
 
 # show plot
 fig = plt.figure(1)
