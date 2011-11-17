@@ -4,9 +4,9 @@ from constants import constants
 
 class port:
     """I/O Port to connect Grids to outer world"""
-    def __init__(self, position, function=None):
+    def __init__(self, x, y, function=None):
         # save arguments
-        self.position = position
+        self.position = x, y
         self.function = function
         self.values = []
 

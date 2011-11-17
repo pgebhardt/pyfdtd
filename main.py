@@ -14,13 +14,13 @@ def f(t):
     return math.exp(-x**2/(2.0*200.0e-12**2))*math.cos(2.0*math.pi*20e9*x)
 
 def mat(x, y):
-    if (x - 0.2)**2 + (y - 0.2)**2 > 0.1**2:
-        return 59.1e6
+    if x - 0.05*math.sin(2.0*math.pi*4.0*y) + 0.3 > 0.0:
+        return 0.0
 
     else:
-        return 0.0
+        return 59.1e6
         
-portlist.append(pyfdtd.port((0.2, 0.2), function=f))
+portlist.append(pyfdtd.port(0.1, 0.2, function=f))
 
 # create solver
 solver = pyfdtd.solver(pyfdtd.field(0.4, 0.4, deltaX=0.001), ports=portlist)
@@ -29,7 +29,7 @@ solver = pyfdtd.solver(pyfdtd.field(0.4, 0.4, deltaX=0.001), ports=portlist)
 solver.material['sigma'] = mat
 
 # iterate
-history = solver.solve(5e-9, saveHistory=True)
+history = solver.solve(2.5e-9, saveHistory=True)
 
 # show plot
 fig = plt.figure(1)
