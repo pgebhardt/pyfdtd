@@ -79,6 +79,9 @@ class material:
         field.oddFieldX['field'] = (1.0/(c1*m1 + m2*deltaT))*(field.oddFieldX['flux'] - self.memoryField.oddFieldX['flux'])
         field.oddFieldY['field'] = (1.0/(c1*m1 + m2*deltaT))*(field.oddFieldY['flux'] - self.memoryField.oddFieldY['flux'])
 
+        self.memoryField.oddFieldX['flux'] += m2*field.oddFieldX['field']*deltaT
+        self.memoryField.oddFieldY['flux'] += m2*field.oddFieldY['field']*deltaT
+
     def apply_even(self, field, deltaT):
         """Calculate field for evenField"""
         # switch mode
@@ -93,3 +96,6 @@ class material:
 
         field.evenFieldX['field'] = (1.0/(c1*m1 + m2*deltaT))*(field.evenFieldX['flux'] - self.memoryField.evenFieldX['flux'])
         field.evenFieldY['field'] = (1.0/(c1*m1 + m2*deltaT))*(field.evenFieldY['flux'] - self.memoryField.evenFieldY['flux'])
+
+        self.memoryField.evenFieldX['flux'] += m2*field.evenFieldX['flux']*deltaT
+        self.memoryField.evenFieldY['flux'] += m2*field.evenFieldY['flux']*deltaT
