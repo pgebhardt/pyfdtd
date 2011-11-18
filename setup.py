@@ -13,7 +13,6 @@ setup(
     download_url='http://github.com/schansge/pyfdtd/downloads',
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
-        "Framework :: Django",
         "Intended Audience :: Developers",
         "Intended Audience :: Education",
         "Intended Audience :: Science/Research",
