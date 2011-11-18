@@ -21,6 +21,5 @@ setup(
 	"Operating System :: OS Independent",
         "Topic :: Scientific/Engineering :: Physics"
     ],
-    packages=['pyfdtd', 'pyfdtd.field', 'pyfdtd.pml', 'pyfdtd.constants', 'pyfdtd.material', 'pyfdtd.port', 'pyfdtd.solver'],
+    packages=['pyfdtd'],
 )
-
