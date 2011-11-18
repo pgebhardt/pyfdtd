@@ -12,7 +12,7 @@ def f(t):
 
 # material function
 def sigma(x, y):
-    if x - 0.02*math.sin(2.0*math.pi*8.0*y) - 0.3 > 0.0:
+    if(x-0.2)**2 + (y-0.2)**2 < 0.13**2 or (x-0.2)**2 + (y-0.2)**2 > 0.15**2:
         return 59.1e6
 
     return 0.0
@@ -24,7 +24,7 @@ solver = pyfdtd.solver(pyfdtd.field(0.4, 0.4, deltaX=0.001))
 solver.material['sigma'] = sigma
 
 # add source
-solver.ports.append(pyfdtd.port(0.1, 0.2, function=f))
+solver.ports.append(pyfdtd.port(0.06, 0.20, function=f))
 
 # iterate
 history = solver.solve(5e-9, saveHistory=True)
