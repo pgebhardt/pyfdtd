@@ -17,7 +17,7 @@ setup(
         "Intended Audience :: Education",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: GNU General Public License (GPL)",
-	"Operating System :: OS Independent",
+	    "Operating System :: OS Independent",
         "Topic :: Scientific/Engineering :: Physics"
     ],
     packages=['pyfdtd'],
