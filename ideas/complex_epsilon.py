@@ -1,13 +1,30 @@
+from types import *
 import numpy
 import pyfdtd
 import copy
 
-def inverse_epsilon(fl, dt, eps, sig):
-    if not hasattr(inverse_epsilon, 'mem'):
-        inverse_epsilon.mem = numpy.zeros(fl.shape)
+class material:
+    def __init__(self, xSize, ySize, deltaX, deltaY, mode='TMz'):
+        self.layer = {}
 
-    fi = (1.0/(pyfdtd.constants.e0*eps + sig*dt))*(fl - inverse_epsilon.mem)
-    inverse_epsilon.mem += sig*fi*dt
+    def __setitem__(self, key, value):
+        # check weather value is a function
+        if not isinstance(value, FunctionType):
+            a = copy.deepcopy(value)
+            value = lambda fl, dt: a*fl
+
+        self.layer[key] = value
+
+mat = material(1.0, 1.0, 0.1, 0.1)
+mat['bla'] = 1.0/pyfdtd.constants.e0
+print mat.layer['bla'](pyfdtd.constants.e0, 0.0)
+
+def standart(fl, dt, a, b):
+    if not hasattr(standart, 'mem'):
+        standart.mem = numpy.zeros(fl.shape)
+
+    fi = (1.0/(pyfdtd.constants.e0*a + b*dt))*(fl - standart.mem)
+    standart.mem += b*fi*dt
     return fi
 
 def form(x, y):
@@ -25,15 +42,15 @@ layer_mask = numpy.ones(flux.shape)
 layer = {}
 
 # add epsilon layer
-layer['epsilon'] = (copy.deepcopy(lambda fl, dt: inverse_epsilon(fl, dt, 1.0, 0.0)), copy.deepcopy(lambda x, y: 1.0))
-layer['cube'] = (copy.deepcopy(lambda fl, dt: inverse_epsilon(fl, dt, 2.0, 1.0)), copy.deepcopy(form))
+layer['epsilon'] = (copy.deepcopy(lambda fl, dt: standart(fl, dt, 1.0, 0.0)), copy.deepcopy(lambda fl, dt: standart(fl, dt, 1.0, 0.0)), copy.deepcopy(lambda x, y: 1.0))
+layer['cube'] = (copy.deepcopy(lambda fl, dt: standart(fl, dt, 2.0, 1.0)), copy.deepcopy(lambda fl, dt: standart(fl, dt, 1.0, 0.0)), copy.deepcopy(form))
 
 # clear field
 field = 0.0*field
 
 # apply layer
 for value in layer.itervalues():
-    func, mask = value
+    funcE, funcH, mask = value
 
     # layer mask
     for i in range(0, 8, 1):
@@ -41,6 +58,6 @@ for value in layer.itervalues():
             layer_mask[i, j] = mask(i, j)
 
     # calc field from flux
-    field = func(flux*layer_mask, 0.1e-9) + (1.0-mask)*field
+    field = funcE(flux*layer_mask, 0.1e-9) + (1.0-layer_mask)*field
 
 print field
