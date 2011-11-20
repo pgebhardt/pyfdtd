@@ -1,12 +1,13 @@
 import numpy
 import pyfdtd
+import copy
 
-def inverse_epsilon(fl, dt):
+def inverse_epsilon(fl, dt, eps, sig):
     if not hasattr(inverse_epsilon, 'mem'):
         inverse_epsilon.mem = numpy.zeros(fl.shape)
 
-    fi = (1.0/(pyfdtd.constants.e0*2.0 + 1.0*dt))*(fl - inverse_epsilon.mem)
-    inverse_epsilon.mem += 1.0*fi*dt
+    fi = (1.0/(pyfdtd.constants.e0*eps + sig*dt))*(fl - inverse_epsilon.mem)
+    inverse_epsilon.mem += sig*fi*dt
     return fi
 
 def form(x, y):
@@ -20,12 +21,26 @@ field = numpy.ones((8, 8))
 
 layer_mask = numpy.ones(flux.shape)
 
-# layer mask
-for i in range(0, 8, 1):
-    for j in range(0, 8, 1):
-        layer_mask[i, j] = form(i, j)
+# layer dict
+layer = {}
 
-# calc field from flux
-for i in range(0, 4, 1):
-    field = inverse_epsilon(flux*layer_mask, 0.1e-9)
-    print field
+# add epsilon layer
+layer['epsilon'] = (copy.deepcopy(lambda fl, dt: inverse_epsilon(fl, dt, 1.0, 0.0)), copy.deepcopy(lambda x, y: 1.0))
+layer['cube'] = (copy.deepcopy(lambda fl, dt: inverse_epsilon(fl, dt, 2.0, 1.0)), copy.deepcopy(form))
+
+# clear field
+field = 0.0*field
+
+# apply layer
+for value in layer.itervalues():
+    func, mask = value
+
+    # layer mask
+    for i in range(0, 8, 1):
+        for j in range(0, 8, 1):
+            layer_mask[i, j] = mask(i, j)
+
+    # calc field from flux
+    field += func(flux*layer_mask, 0.1e-9)
+
+print field
