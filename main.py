@@ -21,7 +21,7 @@ solver.material['sigma',0.07:0.13,0.05:-0.05] = 0.0
 solver.ports.append(pyfdtd.port(0.1, 0.1, function=f))
 
 # iterate
-history = solver.solve(5e-9, saveHistory=True)
+history = solver.solve(10e-9, saveHistory=True)
 
 # show plot
 fig = plt.figure(1)
