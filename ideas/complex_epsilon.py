@@ -41,6 +41,6 @@ for value in layer.itervalues():
             layer_mask[i, j] = mask(i, j)
 
     # calc field from flux
-    field += func(flux*layer_mask, 0.1e-9)
+    field = func(flux*layer_mask, 0.1e-9) + (1.0-mask)*field
 
 print field
