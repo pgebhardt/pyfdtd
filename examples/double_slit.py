@@ -11,28 +11,28 @@ def f(t):
     return math.exp(-x**2/(2.0*200.0e-12**2))*math.cos(2.0*math.pi*20e9*x)
 
 # material function
-def sigma(x, y):
+def slit(x, y):
     if y >= 0.58 and y <= 0.6:
         if (x >= 0.06 and x <= 0.07) or (x >= 0.13 and x <= 0.14):
             return 0.0
 
         else:
-            return 59.1e6
+            return 1.0
 
     return 0.0
 
-def epsilon(x, y):
+def lense(x, y):
     if (x-0.1)**2 + (y-0.2)**2 < 0.15**2 and (x-0.1)**2 + (y-0.4)**2 < 0.15**2:
-        return 2.0
+        return 1.0
 
-    return 1.0
+    return 0.0
 
 # create solver
 solver = pyfdtd.solver(pyfdtd.field(0.2, 0.8, deltaX=0.001))
 
 # add material
-solver.material['sigma'] = sigma
-solver.material['epsilon'] = epsilon
+solver.material['electric'][slit] = pyfdtd.material.standart.epsilon(sigma=59.1e6)
+solver.material['electric'][lense] = pyfdtd.material.standart.epsilon(er=2.0)
 
 # add source
 solver.ports.append(pyfdtd.port(0.1, 0.1, function=f))
@@ -48,6 +48,6 @@ for f in history:
     im = plt.imshow(f, norm=colors.Normalize(-0.01, 0.01))
     ims.append([im])
 
-ani = animation.ArtistAnimation(fig, ims, interval=20)
+ani = animation.ArtistAnimation(fig, ims, interval=50)
 
 plt.show()

@@ -14,8 +14,8 @@ def f(t):
 solver = pyfdtd.solver(pyfdtd.field(0.2, 0.4, deltaX=0.001))
 
 # add material
-solver.material['sigma',:,:] = 59.1e6
-solver.material['sigma',0.07:0.13,0.05:-0.05] = 0.0
+solver.material['electric'][:,:] = pyfdtd.material.standart.epsilon(sigma=59.1e6)
+solver.material['electric'][0.07:0.13,0.05:-0.05] = pyfdtd.material.standart.epsilon()
 
 # add source
 solver.ports.append(pyfdtd.port(0.1, 0.1, function=f))
@@ -31,6 +31,6 @@ for f in history:
     im = plt.imshow(f, norm=colors.Normalize(-0.01, 0.01))
     ims.append([im])
 
-ani = animation.ArtistAnimation(fig, ims, interval=20)
+ani = animation.ArtistAnimation(fig, ims, interval=50)
 
 plt.show()
