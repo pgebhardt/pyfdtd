@@ -5,29 +5,29 @@ Reference
 Field
 =====
 
-.. autoclass:: fdtd.field
+.. autoclass:: pyfdtd.field
     :members: __init__,__getitem__
 
 Port
 =====
 
-.. autoclass:: fdtd.port
+.. autoclass:: pyfdtd.port
     :members: __init__,update
 
 Solver
 ======
 
-.. autoclass:: fdtd.solver
+.. autoclass:: pyfdtd.solver
     :members: __init__,solve
 
 Material
 ========
 
-.. autoclass:: fdtd.material
-    :members: __init__,__getitem__,__setitem__,apply_odd,apply_even
+.. autoclass:: pyfdtd.material
+    :members: __init__,__setitem__,apply,standart
 
 PML
 ===
 
-.. autoclass:: fdtd.pml
+.. autoclass:: pyfdtd.pml
     :members: __init__,apply_odd,apply_even

@@ -1,8 +1,8 @@
-========
-Tutorial
-========
-
+======================
 Creating a simple FDTD
+======================
+
+Create field and solver
 =======================
 
 Probably the first step in using an FDTD is to create the calculation domain.
@@ -39,18 +39,19 @@ To have a look on what is happening in our calculation domain, we can either wat
 the field located at our source or we create a listening port. The only difference
 to a source port is the missing sourcefunction::
 
-   listener = fdtd.port((0.1, 0.5))
+   listener = fdtd.port(0.1, 0.5)
    solver.ports.append(listener) 
 
 Define material
 ===============
 
-Defining some material constants is done with slicing. Pyfdtd defines 'epsilon', 'mu' and 'sigma'
-material constants. To define e.g. a 10cm x 10cm block of coper in our domain we just have to adjust
-the sigma parameter::
+Defining some material is done with a combination of a masking function or a slice
+and with a material function, which calculates the field from the flux density.
+To not write every material function on your own, pyfdtd define two standart materials
+(a complex epsilon and a real mu).
+In this example we create a 10cm x 10cm block of coper using sliceing::
 
-   material = solver.material
-   material['sigma',0.05:0.15,0.3:0.4] = 59.1e6
+   solver.material['electric'][0.05:0.15, 0.3:0.4] = pyfdtd.material.standart.epsilon(sigma=59.1e6)
 
 Solving
 =======
