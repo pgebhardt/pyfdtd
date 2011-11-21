@@ -21,8 +21,8 @@ class solver:
         self.material['magnetic'] = material(field.xSize, field.ySize, field.deltaX, field.deltaY)
 
         # add free space layer
-        self.material['electric'][:,:] = material.standart.epsilon()
-        self.material['magnetic'][:,:] = material.standart.mu()
+        self.material['electric'][:,:] = material.epsilon()
+        self.material['magnetic'][:,:] = material.mu()
 
         # create standart boundary
         self.boundary = pml(field.xSize, field.ySize, field.deltaX, field.deltaY, thickness=20.0)
@@ -82,7 +82,7 @@ class solver:
 
         # update ports
         for port in self.ports:
-            port.update(self.field, t)
+            port.update(self.field, deltaT, t) 
 
         # calc evenField
         self.field.evenFieldX['flux'][:,:-1] -= ky*(self.field.oddFieldX['field'][:,1:] + self.field.oddFieldY['field'][:,1:] - self.field.oddFieldX['field'][:,:-1] - self.field.oddFieldY['field'][:,:-1])

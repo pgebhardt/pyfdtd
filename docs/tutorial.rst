@@ -2,6 +2,10 @@
 Creating a simple FDTD
 ======================
 
+First part of thist tutorial describes the standart way of creating a working
+FDTD from scratch. I will show you how to initialize a the solver, add sources
+and listeners and also how to define some standart materials.
+
 Create field and solver
 =======================
 
@@ -65,3 +69,8 @@ saves the field information in our listener port. For example to plot the field
 at the listener port with matplotlib do as following::
 
    pyplot.plot(listener.values)
+
+========================
+Creating custom matrials
+========================
+
