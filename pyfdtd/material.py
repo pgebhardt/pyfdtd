@@ -110,10 +110,3 @@ class material:
 
             # return function
             return res
-
-if __name__ == '__main__':
-    flux = numpy.ones((20, 20))*constants.e0
-    mat = material(1.0, 1.0, 0.05, 0.05)
-    mat[0.2:0.6,0.2:0.6] = material.standart.epsilon()
-    field = mat.apply(flux, 0.1)
-    print field

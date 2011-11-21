@@ -13,16 +13,8 @@ class solver:
         self.mode = mode
         self.ports = ports
 
-        # create material object
-        self.material = {}
-
-        # create materials
-        self.material['electric'] = material(field.xSize, field.ySize, field.deltaX, field.deltaY)
-        self.material['magnetic'] = material(field.xSize, field.ySize, field.deltaX, field.deltaY)
-
-        # add free space layer
-        self.material['electric'][:,:] = material.standart.epsilon()
-        self.material['magnetic'][:,:] = material.standart.mu()
+        # create free space material
+        self.material = material(field.xSize, field.ySize, field.deltaX, field.deltaY, mode=self.mode)
 
         # create standart boundary
         self.boundary = pml(field.xSize, field.ySize, field.deltaX, field.deltaY, thickness=20.0)
@@ -69,12 +61,8 @@ class solver:
         self.field.oddFieldX['flux'][1:,1:] += kx*(self.field.evenFieldY['field'][1:,1:] - self.field.evenFieldY['field'][:-1,1:])
         self.field.oddFieldY['flux'][1:,1:] -= ky*(self.field.evenFieldX['field'][1:,1:] - self.field.evenFieldX['field'][1:,:-1])
          
-        # apply material
-        if self.mode == 'TMz':
-            self.field.oddFieldX['field'] = self.material['electric'].apply(self.field.oddFieldX['flux'], deltaT)
-            self.field.oddFieldY['field'] = self.material['electric'].apply(self.field.oddFieldY['flux'], deltaT)
-
-        # apply PML
+        # apply material and PML
+        self.material.apply_odd(self.field, deltaT)
         self.boundary.apply_odd(self.field, deltaT)
 
         # update ports
@@ -85,10 +73,6 @@ class solver:
         self.field.evenFieldX['flux'][:,:-1] -= ky*(self.field.oddFieldX['field'][:,1:] + self.field.oddFieldY['field'][:,1:] - self.field.oddFieldX['field'][:,:-1] - self.field.oddFieldY['field'][:,:-1])
         self.field.evenFieldY['flux'][:-1,:] += kx*(self.field.oddFieldX['field'][1:,:] + self.field.oddFieldY['field'][1:,:] - self.field.oddFieldX['field'][:-1,:] - self.field.oddFieldY['field'][:-1,:])
 
-        # apply material
-        if self.mode == 'TMz':
-            self.field.evenFieldX['field'] = self.material['magnetic'].apply(self.field.evenFieldX['flux'], deltaT)
-            self.field.evenFieldY['field'] = self.material['magnetic'].apply(self.field.evenFieldY['flux'], deltaT)
-
-        # apply PML
+        # apply material and PML
+        self.material.apply_even(self.field, deltaT)
         self.boundary.apply_even(self.field, deltaT)

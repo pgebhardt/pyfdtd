@@ -17,7 +17,7 @@ class pml:
         self.mask = numpy.zeros((xShape, yShape))
 
         # apply mode
-        c1, c2 = 1.0, constants.u0/constants.e0
+        c1, c2 = 1.0, constants.mu0/constants.e0
         if mode == 'TEz':
             c1, c2 = c2, c1
 
@@ -49,7 +49,7 @@ class pml:
         # calc oddGrid
         c1 = constants.e0
         if self.mode == 'TEz':
-            c1 = constants.u0
+            c1 = constants.mu0
 
         field.oddFieldX['field'] = (1.0/(c1 + self.material['sigmaOddX']*deltaT))*(field.oddFieldX['flux'] - self.memoryField.oddFieldX['flux'])*self.mask + (1.0-self.mask)*field.oddFieldX['field']
         field.oddFieldY['field'] = (1.0/(c1 + self.material['sigmaOddY']*deltaT))*(field.oddFieldY['flux'] - self.memoryField.oddFieldY['flux'])*self.mask + (1.0-self.mask)*field.oddFieldY['field']
@@ -71,7 +71,7 @@ class pml:
     def apply_even(self, field, deltaT):
         """applies pml for even field components"""
         # calc oddGrid
-        c1 = constants.u0
+        c1 = constants.mu0
         if self.mode == 'TEz':
             c1 = constants.e0
 
