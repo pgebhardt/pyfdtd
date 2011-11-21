@@ -31,8 +31,8 @@ def lense(x, y):
 solver = pyfdtd.solver(pyfdtd.field(0.2, 0.8, deltaX=0.001))
 
 # add material
-solver.material['electric'][slit] = pyfdtd.material.standart.epsilon(sigma=59.1e6)
-solver.material['electric'][lense] = pyfdtd.material.standart.epsilon(er=2.0)
+solver.material['electric'][slit] = pyfdtd.material.epsilon(sigma=59.1e6)
+solver.material['electric'][lense] = pyfdtd.material.epsilon(er=2.0)
 
 # add source
 solver.ports.append(pyfdtd.port(0.1, 0.1, function=f))

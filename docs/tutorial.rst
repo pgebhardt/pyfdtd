@@ -29,7 +29,7 @@ In this example we use a sinoudial modulated gaussian pulse::
 After that we create a port using this sourcefunction in the middle of our domain
 and add it to our solver::
 
-   source = fdtd.port((0.1, 0.1), function=source_function)
+   source = fdtd.port(0.1, 0.1, function=source_function)
    solver.ports.append(source)
 
 Adding a listener

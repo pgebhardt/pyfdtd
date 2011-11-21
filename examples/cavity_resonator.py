@@ -14,8 +14,8 @@ def f(t):
 solver = pyfdtd.solver(pyfdtd.field(0.2, 0.4, deltaX=0.001))
 
 # add material
-solver.material['electric'][:,:] = pyfdtd.material.standart.epsilon(sigma=59.1e6)
-solver.material['electric'][0.07:0.13,0.05:-0.05] = pyfdtd.material.standart.epsilon()
+solver.material['electric'][:,:] = pyfdtd.material.epsilon(sigma=59.1e6)
+solver.material['electric'][0.07:0.13,0.05:-0.05] = pyfdtd.material.epsilon()
 
 # add source
 solver.ports.append(pyfdtd.port(0.1, 0.1, function=f))

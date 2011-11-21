@@ -5,7 +5,23 @@ from constants import constants
 import field as fi
 
 class material:
-    """Descripes the material"""
+    """
+    Container for material layer
+    
+        **Arguments:**
+        
+    xSize (required)
+        Size of all layers in x direction
+        
+    ySize (required)
+        Size of all layers in y direction
+        
+    deltaX (required)
+        Discretization in x direction
+        
+    deltaY (required)
+        discretization in y direction    
+    """
     def __init__(self, xSize, ySize, deltaX, deltaY):
         # save atributes
         self.deltaX = deltaX
@@ -20,6 +36,15 @@ class material:
         """
         Creates a new material layer using key as mask
         and value as material function
+
+            **Arguments:**
+
+        key (required)
+            Function or slice, which describes the layout of the new layer
+
+        value (required)
+            Function or value, which describes the field as a function of
+            the flux desity
         """
         # create mask
         mask = numpy.zeros((self.xSize/self.deltaX, self.ySize/self.deltaY))
@@ -49,7 +74,15 @@ class material:
 
     def apply(self, flux, deltaT):
         """
-        Calculate field from flux density
+        Calculates the field from the flux density
+
+            **Argument:**
+
+        flux (required)
+            Given flux density
+
+        deltaT (required)
+            Time elapsed from last call
         """
         # create field
         field = numpy.zeros(flux.shape)
@@ -63,12 +96,60 @@ class material:
 
         return field
 
+    @staticmethod
+    def epsilon(er=1.0, sigma=0.0):
+        """
+        Returns a material function, which calculates the electric
+        field dependent from flux density and a complex epsilon
+
+            **Arguments:**
+
+        er
+            Relative permittivity
+
+        sigma
+            Conductivity
+        """
+        # create epsilon function
+        def res(flux, dt):              
+            # check if mem already exists
+            if not hasattr(res, 'mem'):
+                res.mem = numpy.zeros(flux.shape)
+
+            field = (1.0/(constants.e0*er + sigma*dt))*(flux - res.mem)
+            res.mem += sigma*field*dt
+            return field
+
+        # return function
+        return res
+
+    @staticmethod
+    def mu(mur=1.0):
+        """
+        Returns a material function, which calculates the magnetic field
+        dependent from flux density and a real mu
+
+            **Arguments:**
+
+        mur
+            Relative permeability
+        """
+        # create mu function
+        def res(flux, dt):
+            return flux/(constants.mu0*mur)
+
+        # return function
+        return res
+
     class _helper:
         """
         Helper functions for internal use
         """
         @staticmethod
         def scale_slice(key, deltaX, deltaY):
+            """
+            Scales the given slices to be used by numpy
+            """
             x, y = key
 
             # scale slices
@@ -83,30 +164,3 @@ class material:
 
             return x, y
 
-    class standart:
-        """
-        Defines a couple a standart material functions
-        """
-        @staticmethod
-        def epsilon(er=1.0, sigma=0.0):
-            # create epsilon function
-            def res(flux, dt):              
-                # check if mem already exists
-                if not hasattr(res, 'mem'):
-                    res.mem = numpy.zeros(flux.shape)
-
-                field = (1.0/(constants.e0*er + sigma*dt))*(flux - res.mem)
-                res.mem += sigma*field*dt
-                return field
-
-            # return function
-            return res
-
-        @staticmethod
-        def mu(mur=1.0):
-            # create mu function
-            def res(flux, dt):
-                return flux/(constants.mu0*mur)
-
-            # return function
-            return res

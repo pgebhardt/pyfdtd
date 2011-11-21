@@ -24,7 +24,7 @@ Material
 ========
 
 .. autoclass:: pyfdtd.material
-    :members: __init__,__setitem__,apply,standart
+    :members: __init__,__setitem__,apply,epsilon,mu
 
 PML
 ===

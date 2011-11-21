@@ -21,7 +21,7 @@ def ring(x, y):
 solver = pyfdtd.solver(pyfdtd.field(0.4, 0.4, deltaX=0.001))
 
 # add material
-solver.material['electric'][ring] = pyfdtd.material.standart.epsilon(sigma=59.1e6)
+solver.material['electric'][ring] = pyfdtd.material.epsilon(sigma=59.1e6)
 
 # add source
 solver.ports.append(pyfdtd.port(0.06, 0.2, function=f))
