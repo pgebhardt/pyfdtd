@@ -8,7 +8,7 @@ import pyfdtd
 # source function
 def f(t):
     x = t - 1000e-12
-    return math.exp(-x**2/(2.0*200.0e-12**2))*math.cos(2.0*math.pi*20e9*x)
+    return 10.0e3*math.exp(-x**2/(2.0*200.0e-12**2))*math.cos(2.0*math.pi*20e9*x)
 
 # material function
 def surface(x, y):
@@ -24,7 +24,7 @@ solver = pyfdtd.solver(pyfdtd.field(0.4, 0.4, deltaX=0.001))
 solver.material['electric'][surface] = pyfdtd.material.epsilon(sigma=59.1e6)
 
 # add source
-solver.ports.append(pyfdtd.port(0.1, 0.2, function=f))
+solver.ports.append(pyfdtd.port(0.1, 0.2, source=f))
 
 # iterate
 history = solver.solve(5e-9, saveHistory=True)
@@ -34,7 +34,7 @@ fig = plt.figure(1)
 
 ims = []
 for f in history:
-    im = plt.imshow(f, norm=colors.Normalize(-0.01, 0.01))
+    im = plt.imshow(f, norm=colors.Normalize(-0.015e-8, 0.015e-8))
     ims.append([im])
 
 ani = animation.ArtistAnimation(fig, ims, interval=50)
