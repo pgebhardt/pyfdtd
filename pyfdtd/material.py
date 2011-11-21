@@ -1,101 +1,119 @@
 from types import *
+import copy
 import numpy
 from constants import constants
 import field as fi
 
 class material:
     """Descripes the material"""
-    def __init__(self, xSize, ySize, deltaX, deltaY, mode='TMz'):
-        # init layer
-        xShape = xSize/deltaX
-        yShape = ySize/deltaY
-        self.material = {'epsilon': numpy.ones((xShape, yShape)), 'mu': numpy.ones((xShape, yShape)), 'sigma': numpy.zeros((xShape, yShape)) }
-
-        # create memoryField
-        self.memoryField = fi.field(xSize, ySize, deltaX, deltaY)
-
+    def __init__(self, xSize, ySize, deltaX, deltaY):
         # save atributes
-        self.mode = mode
         self.deltaX = deltaX
         self.deltaY = deltaY
         self.xSize = xSize
         self.ySize = ySize
 
-    def __getitem__(self, key):
-        """Return material at given location"""
-        # obtain parametes
-        mat, x, y = key
-
-        # scale slices
-        if x.start:
-            x = slice(int(x.start/self.deltaX), x.stop)
-        if x.stop:
-            x = slice(x.start, int(x.stop/self.deltaX))
-        if y.start:
-            y = slice(int(y.start/self.deltaY), y.stop)
-        if y.stop:
-            y = slice(y.start, int(y.stop/self.deltaY))
-
-        # return material
-        return self.material[mat][x, y]
+        # create layer list
+        self.layer = []
 
     def __setitem__(self, key, value):
-        """Set material either at given location or using a function"""
-        # A function value is obtained
-        if isinstance(value, FunctionType):
-            for x in numpy.arange(0.0, self.xSize, self.deltaX):
-                for y in numpy.arange(0.0, self.ySize, self.deltaY):
-                    self.material[key][int(x/self.deltaX), int(y/self.deltaY)] = value(x, y)
+        """
+        Creates a new material layer using key as mask
+        and value as material function
+        """
+        # create mask
+        mask = numpy.zeros((self.xSize/self.deltaX, self.ySize/self.deltaY))
+
+        # check if key is not a function
+        if not isinstance(key, FunctionType):
+            key = material._helper.scale_slice(key, self.deltaX, self.deltaY)
+
+            # evaluate slice
+            ones = numpy.ones((self.xSize/self.deltaX, self.ySize/self.deltaY))
+            mask[key] = ones[key]
 
         else:
-            # A value type is obtained
-            mat, x, y = key
+            # evaluate mask function
+            mask = numpy.zeros((self.xSize/self.deltaX, self.ySize/self.deltaY))
+            for x in range(0, int(self.xSize/self.deltaX), 1):
+                for y in range(0, int(self.ySize/self.deltaY), 1):
+                    mask[x, y] = key(x*self.deltaX, y*self.deltaY)
+    
+        # check if value is a function
+        if not isinstance(value, FunctionType):
+            v = copy.deepcopy(value)
+            value = lambda flux, dt: v
+             
+        # add new layer
+        self.layer.append((copy.deepcopy(value), mask))
+
+    def apply(self, flux, deltaT):
+        """
+        Calculate field from flux density
+        """
+        # create field
+        field = numpy.zeros(flux.shape)
+
+        # apply all layer
+        for layer in self.layer:
+            func, mask = layer
+
+            # calc field
+            field = func(flux*mask, deltaT) + (1.0-mask)*field
+
+        return field
+
+    class _helper:
+        """
+        Helper functions for internal use
+        """
+        @staticmethod
+        def scale_slice(key, deltaX, deltaY):
+            x, y = key
 
             # scale slices
             if x.start:
-                x = slice(int(x.start/self.deltaX), x.stop)
+                x = slice(x.start/deltaX, x.stop)
             if x.stop:
-                x = slice(x.start, int(x.stop/self.deltaX))
+                x = slice(x.start, x.stop/deltaX)
             if y.start:
-                y = slice(int(y.start/self.deltaY), y.stop)
+                y = slice(y.start/deltaY, y.stop)
             if y.stop:
-                y = slice(y.start, int(y.stop/self.deltaY))
+                y = slice(y.start, y.stop/deltaY)
 
-            # set material
-            self.material[mat][x, y] = value
+            return x, y
 
-    def apply_odd(self, field, deltaT):
-        """Calculate field for oddField"""
-        # switch mode
-        c1 = constants.e0
-        m1 = self.material['epsilon']
-        m2 = self.material['sigma']
+    class standart:
+        """
+        Defines a couple a standart material functions
+        """
+        @staticmethod
+        def epsilon(er=1.0, sigma=0.0):
+            # create epsilon function
+            def res(flux, dt):              
+                # check if mem already exists
+                if not hasattr(res, 'mem'):
+                    res.mem = numpy.zeros(flux.shape)
 
-        if self.mode == 'TEz':
-            c1 = constants.u0
-            m1 = self.material['mu']
-            m2 = numpy.zeros(self.material['sigma'].shape)
+                field = (1.0/(constants.e0*er + sigma*dt))*(flux - res.mem)
+                res.mem += sigma*field*dt
+                return field
 
-        field.oddFieldX['field'] = (1.0/(c1*m1 + m2*deltaT))*(field.oddFieldX['flux'] - self.memoryField.oddFieldX['flux'])
-        field.oddFieldY['field'] = (1.0/(c1*m1 + m2*deltaT))*(field.oddFieldY['flux'] - self.memoryField.oddFieldY['flux'])
+            # return function
+            return res
 
-        self.memoryField.oddFieldX['flux'] += m2*field.oddFieldX['field']*deltaT
-        self.memoryField.oddFieldY['flux'] += m2*field.oddFieldY['field']*deltaT
+        @staticmethod
+        def mu(mur=1.0):
+            # create mu function
+            def res(flux, dt):
+                return flux/(constants.mu0*mur)
 
-    def apply_even(self, field, deltaT):
-        """Calculate field for evenField"""
-        # switch mode
-        c1 = constants.u0
-        m1 = self.material['mu']
-        m2 = numpy.zeros(self.material['sigma'].shape)
+            # return function
+            return res
 
-        if self.mode == 'TEz':
-            c1 = constants.e0
-            m1 = self.material['epsilon']
-            m2 = self.material['sigma']
-
-        field.evenFieldX['field'] = (1.0/(c1*m1 + m2*deltaT))*(field.evenFieldX['flux'] - self.memoryField.evenFieldX['flux'])
-        field.evenFieldY['field'] = (1.0/(c1*m1 + m2*deltaT))*(field.evenFieldY['flux'] - self.memoryField.evenFieldY['flux'])
-
-        self.memoryField.evenFieldX['flux'] += m2*field.evenFieldX['flux']*deltaT
-        self.memoryField.evenFieldY['flux'] += m2*field.evenFieldY['flux']*deltaT
+if __name__ == '__main__':
+    flux = numpy.ones((20, 20))*constants.e0
+    mat = material(1.0, 1.0, 0.05, 0.05)
+    mat[0.2:0.6,0.2:0.6] = material.standart.epsilon()
+    field = mat.apply(flux, 0.1)
+    print field
