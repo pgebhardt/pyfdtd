@@ -51,7 +51,7 @@ To not write every material function on your own, pyfdtd define two standart mat
 (a complex epsilon and a real mu).
 In this example we create a 10cm x 10cm block of coper using sliceing::
 
-   solver.material['electric'][0.05:0.15, 0.3:0.4] = pyfdtd.material.standart.epsilon(sigma=59.1e6)
+   solver.material['electric'][0.05:0.15, 0.3:0.4] = pyfdtd.material.epsilon(sigma=59.1e6)
 
 Solving
 =======
