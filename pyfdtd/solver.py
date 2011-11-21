@@ -71,12 +71,10 @@ class solver:
          
         # apply material
         if self.mode == 'TMz':
-            self.field.oddFieldX['field'] = self.material['electric'].apply(self.field.oddFieldX['flux'], deltaT)
-            self.field.oddFieldY['field'] = self.material['electric'].apply(self.field.oddFieldY['flux'], deltaT)
+            self.field.oddFieldX['field'], self.field.oddFieldY['field'] = self.material['electric'].apply((self.field.oddFieldX['flux'], self.field.oddFieldY['flux']),deltaT)
         elif self.mode == 'TEz':
-            self.field.oddFieldX['field'] = self.material['magnetic'].apply(self.field.oddFieldX['flux'], deltaT)
-            self.field.oddFieldY['field'] = self.material['magnetic'].apply(self.field.oddFieldY['flux'], deltaT)
-
+            self.field.oddFieldX['field'], self.field.oddFieldY['field'] = self.material['magnetic'].apply((self.field.oddFieldX['flux'], self.field.oddFieldY['flux']),deltaT)
+            
         # apply PML
         self.boundary.apply_odd(self.field, deltaT)
 
@@ -90,11 +88,9 @@ class solver:
 
         # apply material
         if self.mode == 'TMz':
-            self.field.evenFieldX['field'] = self.material['magnetic'].apply(self.field.evenFieldX['flux'], deltaT)
-            self.field.evenFieldY['field'] = self.material['magnetic'].apply(self.field.evenFieldY['flux'], deltaT)
+            self.field.evenFieldX['field'], self.field.evenFieldY['field'] = self.material['magnetic'].apply((self.field.evenFieldX['flux'], self.field.evenFieldY['flux']),deltaT)
         elif self.mode == 'TEz':
-            self.field.evenFieldX['field'] = self.material['electric'].apply(self.field.evenFieldX['flux'], deltaT)
-            self.field.evenFieldY['field'] = self.material['electric'].apply(self.field.evenFieldY['flux'], deltaT)
+            self.field.evenFieldX['field'], self.field.evenFieldY['field'] = self.material['electric'].apply((self.field.evenFieldX['flux'], self.field.evenFieldY['flux']),deltaT)
 
         # apply PML
         self.boundary.apply_even(self.field, deltaT)

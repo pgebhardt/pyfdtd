@@ -70,7 +70,7 @@ class material:
             value = lambda flux, dt: v
              
         # add new layer
-        self.layer.append((copy.deepcopy(value), mask))
+        self.layer.append((copy.deepcopy(value), copy.deepcopy(value), mask))
 
     def apply(self, flux, deltaT):
         """
@@ -84,17 +84,21 @@ class material:
         deltaT (required)
             Time elapsed from last call
         """
+        # get flux
+        fluxX, fluxY = flux
+
         # create field
-        field = numpy.zeros(flux.shape)
+        fieldX, fieldY = numpy.zeros(fluxX.shape), numpy.zeros(fluxY.shape)
 
         # apply all layer
         for layer in self.layer:
-            func, mask = layer
+            funcX, funcY, mask = layer
 
             # calc field
-            field = func(flux*mask, deltaT) + (1.0-mask)*field
+            fieldX = funcX(fluxX*mask, deltaT) + (1.0-mask)*fieldX
+            fieldY = funcY(fluxY*mask, deltaT) + (1.0-mask)*fieldY
 
-        return field
+        return fieldX, fieldY
 
     @staticmethod
     def epsilon(er=1.0, sigma=0.0):
