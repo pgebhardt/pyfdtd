@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='pyfdtd',
-    version='0.1.0',
+    version='0.2.0',
     description='2D FDTD using numpy',
     long_description='pyfdtd is a 2D electromagnetic fieldsolver in time-domain using numpy.',
     author=', '.join((
