@@ -24,7 +24,9 @@ boundary condition, no listening or source ports and in TMz mode.
 Adding a sources
 ================
 
-To add a source to our domain we first need a function to discribe the field.
+To add a source to our domain we first need a function to discribe the current density.
+As we know current densities are the sources of EM waves. So the value oure source function
+returns is messured in A/m^2.
 In this example we use a sinoudial modulated gaussian pulse::
 
    def source_function(t):
