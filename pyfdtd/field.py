@@ -1,5 +1,4 @@
 import numpy
-import scipy.interpolate
 
 class field:
     """
