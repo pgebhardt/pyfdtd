@@ -24,21 +24,21 @@ class pml:
 
         for n in range(0, int(thickness+1.0), 1):
             for j in range(0, int(yShape), 1):
-                sigma['electricX'][n, j] = sigmaMax*math.pow((thickness-n)/thickness, 3.0)
-                sigma['magneticX'][n, j] = sigmaMax*math.pow((thickness-n)/thickness, 3.0)*c1
+                sigma['electricX'][n, j] = sigmaMax*math.pow(float(thickness-n)/thickness, 3.0)
+                sigma['magneticX'][n, j] = sigmaMax*math.pow(float(thickness-n-0.5)/thickness, 3.0)*c1
                 mask[n, j] = 1.0
 
-                sigma['electricX'][xShape-1-n, j] = sigmaMax*math.pow((thickness-n)/thickness, 3.0)
-                sigma['magneticX'][xShape-1-n, j] = sigmaMax*math.pow((thickness-n)/thickness, 3.0)*c1
+                sigma['electricX'][xShape-1-n, j] = sigmaMax*math.pow(float(thickness-n)/thickness, 3.0)
+                sigma['magneticX'][xShape-1-n, j] = sigmaMax*math.pow(float(thickness-n+0.5)/thickness, 3.0)*c1
                 mask[xShape-1-n, j] = 1.0
 
             for i in range(0, int(xShape), 1):
-                sigma['electricY'][i, n] = sigmaMax*math.pow((thickness-n)/thickness, 3.0)
-                sigma['magneticY'][i, n] = sigmaMax*math.pow((thickness-n)/thickness, 3.0)*c1
+                sigma['electricY'][i, n] = sigmaMax*math.pow(float(thickness-n)/thickness, 3.0)
+                sigma['magneticY'][i, n] = sigmaMax*math.pow(float(thickness-n-0.5)/thickness, 3.0)*c1
                 mask[i, n] = 1.0
 
-                sigma['electricY'][i, yShape-1-n] = sigmaMax*math.pow((thickness-n)/thickness, 3.0)
-                sigma['magneticY'][i, yShape-1-n] = sigmaMax*math.pow((thickness-n)/thickness, 3.0)*c1
+                sigma['electricY'][i, yShape-1-n] = sigmaMax*math.pow(float(thickness-n)/thickness, 3.0)
+                sigma['magneticY'][i, yShape-1-n] = sigmaMax*math.pow(float(thickness-n+0.5)/thickness, 3.0)*c1
                 mask[i, yShape-1-n] = 1.0
 
         # apply mode

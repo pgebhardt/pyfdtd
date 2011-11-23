@@ -25,7 +25,7 @@ class solver:
         self.material['magnetic'][:,:] = material.mu()
 
         # add pml layer
-        p = pml(field.xSize, field.ySize, field.deltaX, field.deltaY, thickness=20.0, mode=mode)
+        p = pml(field.xSize, field.ySize, field.deltaX, field.deltaY, mode=mode)
         self.material['electric'].layer.append(p.layer['electric'])
         self.material['magnetic'].layer.append(p.layer['magnetic'])
 
