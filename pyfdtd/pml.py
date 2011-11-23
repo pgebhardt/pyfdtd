@@ -1,5 +1,6 @@
 import numpy
 import math
+import copy
 import field as fi
 from material import material
 from constants import constants
@@ -41,17 +42,44 @@ class pml:
                 sigma['magneticY'][i, yShape-1-n] = sigmaMaxX*math.pow((thickness-n)/thickness, 3.0)*c1
                 mask[i, yShape-1-n] = 1.0
 
-        # create odd field function
-        def oddField(flux, dt):
+        # apply mode
+        matFuncX, matFuncY = None, None
+        if mode == 'TMz':
+            matFuncX, matFuncY = material.epsilon(1.0, sigma['electricX']), material.epsilon(1.0, sigma['electricY'])
+        elif mode == 'TEz':
+            matFuncX, matFuncY = material.mu(1.0, sigma['magneticX']), material.mu(1.0, sigma['magneticY'])
 
+        # define oddField function
+        def oddFieldX(flux, dt):
+            # apply material function
+            field = matFuncX(flux, dt)
 
-        # apply boundary condition
-        field.oddFieldX['field'][:1,:] = 0.0
-        field.oddFieldY['field'][:1,:] = 0.0
-        field.oddFieldX['field'][-1:,:] = 0.0
-        field.oddFieldY['field'][-1:,:] = 0.0
-        
-        field.oddFieldX['field'][:,:1] = 0.0
-        field.oddFieldY['field'][:,:1] = 0.0
-        field.oddFieldX['field'][:,-1:] = 0.0
-        field.oddFieldY['field'][:,-1:] = 0.0 
+            # apply boundary condition
+            field[:1,:] = 0.0
+            field[-1:,:] = 0.0
+            field[:,:1] = 0.0
+            field[:,-1:] = 0.0
+
+            # return field
+            return field
+
+        def oddFieldY(flux, dt):
+            # apply material function
+            field = matFuncY(flux, dt)
+
+            # apply boundary condition
+            field[:1,:] = 0.0
+            field[-1:,:] = 0.0
+            field[:,:1] = 0.0
+            field[:,-1:] = 0.0
+
+            # return field
+            return field
+
+        # create layer
+        if mode == 'TMz':
+            self.layer['electric'] = (copy.deepcopy(oddFieldX), copy.deepcopy(oddFieldY), mask)
+            self.layer['magnetic'] = (copy.deepcopy(material.mu(1.0, sigma['magneticX'])), copy.deepcopy(material.mu(1.0, sigma['magneticY'])), mask)
+        elif mode == 'TEz':
+            self.layer['magnetic'] = (copy.deepcopy(oddFieldX), copy.deepcopy(oddFieldY), mask)
+            self.layer['electric'] = (copy.deepcopy(material.epsilon(1.0, sigma['electricX'])), copy.deepcopy(material.epsilon(1.0, sigma['electricY'])), mask)
