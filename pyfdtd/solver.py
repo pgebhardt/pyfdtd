@@ -24,8 +24,10 @@ class solver:
         self.material['electric'][:,:] = material.epsilon()
         self.material['magnetic'][:,:] = material.mu()
 
-        # create standart boundary
-        self.boundary = pml(field.xSize, field.ySize, field.deltaX, field.deltaY, thickness=20.0)
+        # add pml layer
+        p = pml(field.xSize, field.ySize, field.deltaX, field.deltaY, thickness=20.0, mode=mode)
+        self.material['electric'].layer.append(p.layer['electric'])
+        self.material['magnetic'].layer.append(p.layer['magnetic'])
 
     def solve(self, duration, starttime=0.0, deltaT=0.0, saveHistory=False, maxHistoryMemory=256e6):
         """Iterates the FDTD algorithm in respect of the pre-defined ports"""
@@ -74,9 +76,6 @@ class solver:
             self.field.oddFieldX['field'], self.field.oddFieldY['field'] = self.material['electric'].apply((self.field.oddFieldX['flux'], self.field.oddFieldY['flux']),deltaT)
         elif self.mode == 'TEz':
             self.field.oddFieldX['field'], self.field.oddFieldY['field'] = self.material['magnetic'].apply((self.field.oddFieldX['flux'], self.field.oddFieldY['flux']),deltaT)
-            
-        # apply PML
-        self.boundary.apply_odd(self.field, deltaT)
 
         # update ports
         for port in self.ports:
@@ -91,6 +90,3 @@ class solver:
             self.field.evenFieldX['field'], self.field.evenFieldY['field'] = self.material['magnetic'].apply((self.field.evenFieldX['flux'], self.field.evenFieldY['flux']),deltaT)
         elif self.mode == 'TEz':
             self.field.evenFieldX['field'], self.field.evenFieldY['field'] = self.material['electric'].apply((self.field.evenFieldX['flux'], self.field.evenFieldY['flux']),deltaT)
-
-        # apply PML
-        self.boundary.apply_even(self.field, deltaT)
