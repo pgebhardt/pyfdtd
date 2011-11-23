@@ -20,25 +20,25 @@ class pml:
         c1 = constants.mu0/constants.e0
 
         # init PML
-        sigmaMax = -(3.0 + 1.0)*constants.e0*constants.c0*math.log(1.0e-8)/(2.0*deltaX*thickness)
+        sigmaMax = -(3.0 + 1.0)*constants.e0*constants.c0*math.log(1.0e-15)/(2.0*deltaX*thickness)
 
         for n in range(0, int(thickness+1.0), 1):
             for j in range(0, int(yShape), 1):
-                sigma['electricX'][n, j] = sigmaMax*math.pow(float(thickness-n)/thickness, 3.0)
-                sigma['magneticX'][n, j] = sigmaMax*math.pow(float(thickness-n-0.5)/thickness, 3.0)*c1
+                sigma['electricY'][n, j] = sigmaMax*math.pow(float(thickness-n)/thickness, 3.0)
+                sigma['magneticY'][n, j] = sigmaMax*math.pow(float(thickness-n-0.5)/thickness, 3.0)*c1
                 mask[n, j] = 1.0
 
-                sigma['electricX'][xShape-1-n, j] = sigmaMax*math.pow(float(thickness-n)/thickness, 3.0)
-                sigma['magneticX'][xShape-1-n, j] = sigmaMax*math.pow(float(thickness-n+0.5)/thickness, 3.0)*c1
+                sigma['electricY'][xShape-1-n, j] = sigmaMax*math.pow(float(thickness-n)/thickness, 3.0)
+                sigma['magneticY'][xShape-1-n, j] = sigmaMax*math.pow(float(thickness-n+0.5)/thickness, 3.0)*c1
                 mask[xShape-1-n, j] = 1.0
 
             for i in range(0, int(xShape), 1):
-                sigma['electricY'][i, n] = sigmaMax*math.pow(float(thickness-n)/thickness, 3.0)
-                sigma['magneticY'][i, n] = sigmaMax*math.pow(float(thickness-n-0.5)/thickness, 3.0)*c1
+                sigma['electricX'][i, n] = sigmaMax*math.pow(float(thickness-n)/thickness, 3.0)
+                sigma['magneticX'][i, n] = sigmaMax*math.pow(float(thickness-n-0.5)/thickness, 3.0)*c1
                 mask[i, n] = 1.0
 
-                sigma['electricY'][i, yShape-1-n] = sigmaMax*math.pow(float(thickness-n)/thickness, 3.0)
-                sigma['magneticY'][i, yShape-1-n] = sigmaMax*math.pow(float(thickness-n+0.5)/thickness, 3.0)*c1
+                sigma['electricX'][i, yShape-1-n] = sigmaMax*math.pow(float(thickness-n)/thickness, 3.0)
+                sigma['magneticX'][i, yShape-1-n] = sigmaMax*math.pow(float(thickness-n+0.5)/thickness, 3.0)*c1
                 mask[i, yShape-1-n] = 1.0
 
         # create layer
