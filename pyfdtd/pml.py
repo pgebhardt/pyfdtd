@@ -12,14 +12,14 @@ class pml:
         c = constants.mu0/constants.e0
 
         # init PML
-        sigma = -(3.0 + 1.0)*constants.e0*constants.c0*math.log(1.0e-15)/(2.0*deltaX*thickness)
+        sigma = -(3.0 + 1.0)*constants.e0*constants.c0*math.log(1.0e-15)/(2.0*thickness)
 
         # create layer
         mat['electric'][:,:thickness] = material.epsilon(sigma=sigma)
         mat['magnetic'][:,:thickness] = material.mu(sigma=sigma*c)
         mat['electric'][:,-thickness:] = material.epsilon(sigma=sigma)
         mat['magnetic'][:,-thickness:] = material.mu(sigma=sigma*c)
-        mat['electric'][:thicknessm:] = material.epsilon(sigma=sigma)
+        mat['electric'][:thickness,:] = material.epsilon(sigma=sigma)
         mat['magnetic'][:thickness,:] = material.mu(sigma=sigma*c)
         mat['electric'][-thickness:,:] = material.epsilon(sigma=sigma)
         mat['magnetic'][-thickness:,:] = material.mu(sigma=sigma*c)
