@@ -128,7 +128,7 @@ class material:
         return res
 
     @staticmethod
-    def mu(mur=1.0):
+    def mu(mur=1.0, sigma=0.0):
         """
         Returns a material function, which calculates the magnetic field
         dependent from flux density and a real mu
@@ -140,7 +140,13 @@ class material:
         """
         # create mu function
         def res(flux, dt):
-            return flux/(constants.mu0*mur)
+            # check if mem already exists
+            if not hasattr(res, 'mem'):
+                res.mem = numpy.zeros(flux.shape)
+
+            field = (1.0/(constants.mu0*mur + sigma*dt))*(flux - res.mem)
+            res.mem += sigma*field*dt
+            return field
 
         # return function
         return res

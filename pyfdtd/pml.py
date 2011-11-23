@@ -6,7 +6,7 @@ from constants import constants
 
 class pml:
     """Applies a perfectly matched layer as surounding boundary conditions"""
-    def __init__(self, xSize, ySize, deltaX, deltaY, thickness=8.0):
+    def __init__(self, xSize, ySize, deltaX, deltaY, thickness=8.0, mode='TMz'):
         # init layer container
         self.layer = {}
 
@@ -41,18 +41,9 @@ class pml:
                 sigma['magneticY'][i, yShape-1-n] = sigmaMaxX*math.pow((thickness-n)/thickness, 3.0)*c1
                 mask[i, yShape-1-n] = 1.0
 
-    def apply_odd(self, field, deltaT):
-        """applies pml for odd field components"""
-        # calc oddGrid
-        c1 = constants.e0
-        if self.mode == 'TEz':
-            c1 = constants.mu0
+        # create odd field function
+        def oddField(flux, dt):
 
-        field.oddFieldX['field'] = (1.0/(c1 + self.material['sigmaOddX']*deltaT))*(field.oddFieldX['flux'] - self.memoryField.oddFieldX['flux'])*self.mask + (1.0-self.mask)*field.oddFieldX['field']
-        field.oddFieldY['field'] = (1.0/(c1 + self.material['sigmaOddY']*deltaT))*(field.oddFieldY['flux'] - self.memoryField.oddFieldY['flux'])*self.mask + (1.0-self.mask)*field.oddFieldY['field']
-
-        self.memoryField.oddFieldX['flux'] += self.material['sigmaOddX']*field.oddFieldX['field']*deltaT*self.mask
-        self.memoryField.oddFieldY['flux'] += self.material['sigmaOddY']*field.oddFieldY['field']*deltaT*self.mask
 
         # apply boundary condition
         field.oddFieldX['field'][:1,:] = 0.0
@@ -63,18 +54,4 @@ class pml:
         field.oddFieldX['field'][:,:1] = 0.0
         field.oddFieldY['field'][:,:1] = 0.0
         field.oddFieldX['field'][:,-1:] = 0.0
-        field.oddFieldY['field'][:,-1:] = 0.0
-
-    def apply_even(self, field, deltaT):
-        """applies pml for even field components"""
-        # calc oddGrid
-        c1 = constants.mu0
-        if self.mode == 'TEz':
-            c1 = constants.e0
-
-        field.evenFieldX['field'] = (1.0/(c1 + self.material['sigmaEvenX']*deltaT))*(field.evenFieldX['flux'] - self.memoryField.evenFieldX['flux'])*self.mask + (1.0-self.mask)*field.evenFieldX['field']
-        field.evenFieldY['field'] = (1.0/(c1 + self.material['sigmaEvenY']*deltaT))*(field.evenFieldY['flux'] - self.memoryField.evenFieldY['flux'])*self.mask + (1.0-self.mask)*field.evenFieldY['field']
-
-        self.memoryField.evenFieldX['flux'] += self.material['sigmaEvenX']*field.evenFieldX['field']*deltaT*self.mask
-        self.memoryField.evenFieldY['flux'] += self.material['sigmaEvenY']*field.evenFieldY['field']*deltaT*self.mask
-        
+        field.oddFieldY['field'][:,-1:] = 0.0 
