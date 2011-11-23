@@ -1,25 +1,22 @@
 import numpy
 import math
 import field as fi
+from material import material
 from constants import constants
 
 class pml:
     """Applies a perfectly matched layer as surounding boundary conditions"""
-    def __init__(self, xSize, ySize, deltaX, deltaY, thickness=8.0, mode='TMz'):
-        # init
-        self.mode = mode
-        self.thickness = thickness
-        self.memoryField = fi.field(xSize, ySize, deltaX, deltaY)
+    def __init__(self, xSize, ySize, deltaX, deltaY, thickness=8.0):
+        # init layer container
+        self.layer = {}
 
         # crate material
         xShape, yShape = xSize/deltaX, ySize/deltaY
-        self.material = { 'sigmaOddX': numpy.zeros((xShape, yShape)), 'sigmaOddY': numpy.zeros((xShape, yShape)), 'sigmaEvenX': numpy.zeros((xShape, yShape)), 'sigmaEvenY': numpy.zeros((xShape, yShape)) }
-        self.mask = numpy.zeros((xShape, yShape))
+        sigma = { 'electricX': numpy.zeros((xShape, yShape)), 'electricY': numpy.zeros((xShape, yShape)), 'magneticX': numpy.zeros((xShape, yShape)), 'magneticY': numpy.zeros((xShape, yShape)) }
+        mask = numpy.zeros((xShape, yShape))
 
-        # apply mode
-        c1, c2 = 1.0, constants.mu0/constants.e0
-        if mode == 'TEz':
-            c1, c2 = c2, c1
+        # set constant
+        c1 = constants.mu0/constants.e0
 
         # init PML
         sigmaMaxX = -(3.0 + 1.0)*constants.e0*constants.c0*math.log(1.0e-8)/(2.0*deltaX*thickness)
@@ -27,22 +24,22 @@ class pml:
 
         for n in range(0, int(thickness+1.0), 1):
             for j in range(0, int(yShape), 1):
-                self.material['sigmaOddX'][n, j] = sigmaMaxY*math.pow((thickness-n)/thickness, 3.0)*c1
-                self.material['sigmaEvenX'][n, j] = sigmaMaxY*math.pow((thickness-n)/thickness, 3.0)*c2
-                self.mask[n, j] = 1.0
+                sigma['electricX'][n, j] = sigmaMaxY*math.pow((thickness-n)/thickness, 3.0)
+                sigma['magneticX'][n, j] = sigmaMaxY*math.pow((thickness-n)/thickness, 3.0)*c1
+                mask[n, j] = 1.0
 
-                self.material['sigmaOddX'][xShape-1-n, j] = sigmaMaxY*math.pow((thickness-n)/thickness, 3.0)*c1
-                self.material['sigmaEvenX'][xShape-1-n, j] = sigmaMaxY*math.pow((thickness-n)/thickness, 3.0)*c2
-                self.mask[xShape-1-n, j] = 1.0
+                sigma['electricX'][xShape-1-n, j] = sigmaMaxY*math.pow((thickness-n)/thickness, 3.0)
+                sigma['magneticX'][xShape-1-n, j] = sigmaMaxY*math.pow((thickness-n)/thickness, 3.0)*c1
+                mask[xShape-1-n, j] = 1.0
 
             for i in range(0, int(xShape), 1):
-                self.material['sigmaOddY'][i, n] = sigmaMaxX*math.pow((thickness-n)/thickness, 3.0)*c1
-                self.material['sigmaEvenY'][i, n] = sigmaMaxX*math.pow((thickness-n)/thickness, 3.0)*c2
-                self.mask[i, n] = 1.0
+                sigma['electricY'][i, n] = sigmaMaxX*math.pow((thickness-n)/thickness, 3.0)
+                sigma['magneticY'][i, n] = sigmaMaxX*math.pow((thickness-n)/thickness, 3.0)*c1
+                mask[i, n] = 1.0
 
-                self.material['sigmaOddY'][i, yShape-1-n] = sigmaMaxX*math.pow((thickness-n)/thickness, 3.0)*c1
-                self.material['sigmaEvenY'][i, yShape-1-n] = sigmaMaxX*math.pow((thickness-n)/thickness, 3.0)*c2
-                self.mask[i, yShape-1-n] = 1.0
+                sigma['electricY'][i, yShape-1-n] = sigmaMaxX*math.pow((thickness-n)/thickness, 3.0)
+                sigma['magneticY'][i, yShape-1-n] = sigmaMaxX*math.pow((thickness-n)/thickness, 3.0)*c1
+                mask[i, yShape-1-n] = 1.0
 
     def apply_odd(self, field, deltaT):
         """applies pml for odd field components"""
