@@ -1,8 +1,8 @@
-PyFDTD is a 2D electromagnetic fieldsolver in time-domain using numpy
+PyFDTD is a 2D electromagnetic fieldsolver in time-domain using numpy.
 
 It features a fully implemented input (source) and output port handling,
-as well as implementations of pml and static materials with epsilon, mu
-and sigma.
+as well as functional material handling including predefined standarts
+like complex epsilon, complex mu and pml.
 
 Documentation is available from http://schansge.github.com/pyfdtd
 
