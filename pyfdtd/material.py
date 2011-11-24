@@ -67,12 +67,12 @@ class material:
         # check if value is a function
         if not isinstance(value, FunctionType):
             v = copy.deepcopy(value)
-            value = lambda flux, dt: v
+            value = lambda flux, dt, t: v
              
         # add new layer
         self.layer.append((copy.deepcopy(value), copy.deepcopy(value), mask))
 
-    def apply(self, flux, deltaT):
+    def apply(self, flux, deltaT, t):
         """
         Calculates the field from the flux density
 
@@ -95,8 +95,8 @@ class material:
             funcX, funcY, mask = layer
 
             # calc field
-            fieldX = funcX(fluxX*mask, deltaT) + (1.0-mask)*fieldX
-            fieldY = funcY(fluxY*mask, deltaT) + (1.0-mask)*fieldY
+            fieldX = funcX(fluxX*mask, deltaT, t) + (1.0-mask)*fieldX
+            fieldY = funcY(fluxY*mask, deltaT, t) + (1.0-mask)*fieldY
 
         return fieldX, fieldY
 
@@ -115,7 +115,7 @@ class material:
             Conductivity
         """
         # create epsilon function
-        def res(flux, dt):              
+        def res(flux, dt, t):              
             # check if mem already exists
             if not hasattr(res, 'mem'):
                 res.mem = numpy.zeros(flux.shape)
@@ -139,7 +139,7 @@ class material:
             Relative permeability
         """
         # create mu function
-        def res(flux, dt):
+        def res(flux, dt, t):
             # check if mem already exists
             if not hasattr(res, 'mem'):
                 res.mem = numpy.zeros(flux.shape)
