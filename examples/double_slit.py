@@ -10,7 +10,7 @@ def f(t):
     x = t - 1000e-12
     return 10.0e3*math.exp(-x**2/(2.0*200.0e-12**2))*math.cos(2.0*math.pi*20e9*x)
 
-# material function
+# mask functions
 def slit(x, y):
     if y >= 0.58 and y <= 0.6:
         if (x >= 0.06 and x <= 0.07) or (x >= 0.13 and x <= 0.14):
