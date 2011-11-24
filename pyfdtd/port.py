@@ -22,14 +22,6 @@ class port:
         # apply function
         f = 0.0
         if self.source:
-            f = -deltaT*self.source(t-0.5*deltaT)
-            field.oddFieldX['field'][x, y] += 0.5*f
-            field.oddFieldY['field'][x, y] += 0.5*f
-
-    @staticmethod
-    def source(function):
-        """
-        Returns the function as a valid material function
-        """
-        def res(flux, deltaT, t):
-            pass
+            f = -0.5*deltaT*self.source(t-0.5*deltaT)
+            field.oddFieldX['flux'][x, y] += f
+            field.oddFieldY['flux'][x, y] += f

@@ -71,15 +71,15 @@ class solver:
         self.field.oddFieldX['flux'][1:,1:] += kx*(self.field.evenFieldY['field'][1:,1:] - self.field.evenFieldY['field'][:-1,1:])
         self.field.oddFieldY['flux'][1:,1:] -= ky*(self.field.evenFieldX['field'][1:,1:] - self.field.evenFieldX['field'][1:,:-1])
          
+        # update ports
+        for port in self.ports:
+            port.update(self.field, deltaT, t)
+
         # apply material
         if self.mode == 'TMz':
             self.field.oddFieldX['field'], self.field.oddFieldY['field'] = self.material['electric'].apply((self.field.oddFieldX['flux'], self.field.oddFieldY['flux']), deltaT, t)
         elif self.mode == 'TEz':
             self.field.oddFieldX['field'], self.field.oddFieldY['field'] = self.material['magnetic'].apply((self.field.oddFieldX['flux'], self.field.oddFieldY['flux']), deltaT, t)
-
-        # update ports
-        for port in self.ports:
-            port.update(self.field, deltaT, t) 
 
         # calc evenField
         self.field.evenFieldX['flux'][:,:-1] -= ky*(self.field.oddFieldX['field'][:,1:] + self.field.oddFieldY['field'][:,1:] - self.field.oddFieldX['field'][:,:-1] - self.field.oddFieldY['field'][:,:-1])

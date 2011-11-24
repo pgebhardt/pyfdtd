@@ -8,7 +8,7 @@ import pyfdtd
 # source function
 def f(t):
     x = t - 1000e-12
-    return 10.0e3*math.exp(-x**2/(2.0*200.0e-12**2))*math.cos(2.0*math.pi*20e9*x)
+    return 1.0e3*math.exp(-x**2/(2.0*200.0e-12**2))*math.cos(2.0*math.pi*20e9*x)
 
 # mask functions
 def slit(x, y):
@@ -45,7 +45,7 @@ fig = plt.figure(1)
 
 ims = []
 for f in history:
-    im = plt.imshow(f, norm=colors.Normalize(-0.015e-8, 0.015e-8))
+    im = plt.imshow(f, norm=colors.Normalize(-10.0, 10.0))
     ims.append([im])
 
 ani = animation.ArtistAnimation(fig, ims, interval=50)
