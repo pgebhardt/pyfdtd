@@ -67,7 +67,7 @@ class material:
         # check if value is a function
         if not isinstance(value, FunctionType):
             v = copy.deepcopy(value)
-            value = lambda flux, dt, t: v
+            value = lambda flux, dt, t: v*flux
              
         # add new layer
         self.layer.append((copy.deepcopy(value), copy.deepcopy(value), mask))

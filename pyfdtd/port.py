@@ -25,3 +25,11 @@ class port:
             f = -deltaT*self.source(t-0.5*deltaT)
             field.oddFieldX['field'][x, y] += 0.5*f
             field.oddFieldY['field'][x, y] += 0.5*f
+
+    @staticmethod
+    def source(function):
+        """
+        Returns the function as a valid material function
+        """
+        def res(flux, deltaT, t):
+            pass

@@ -73,9 +73,9 @@ class solver:
          
         # apply material
         if self.mode == 'TMz':
-            self.field.oddFieldX['field'], self.field.oddFieldY['field'] = self.material['electric'].apply((self.field.oddFieldX['flux'], self.field.oddFieldY['flux']),deltaT)
+            self.field.oddFieldX['field'], self.field.oddFieldY['field'] = self.material['electric'].apply((self.field.oddFieldX['flux'], self.field.oddFieldY['flux']), deltaT, t)
         elif self.mode == 'TEz':
-            self.field.oddFieldX['field'], self.field.oddFieldY['field'] = self.material['magnetic'].apply((self.field.oddFieldX['flux'], self.field.oddFieldY['flux']),deltaT)
+            self.field.oddFieldX['field'], self.field.oddFieldY['field'] = self.material['magnetic'].apply((self.field.oddFieldX['flux'], self.field.oddFieldY['flux']), deltaT, t)
 
         # update ports
         for port in self.ports:
@@ -87,6 +87,6 @@ class solver:
 
         # apply material
         if self.mode == 'TMz':
-            self.field.evenFieldX['field'], self.field.evenFieldY['field'] = self.material['magnetic'].apply((self.field.evenFieldX['flux'], self.field.evenFieldY['flux']),deltaT)
+            self.field.evenFieldX['field'], self.field.evenFieldY['field'] = self.material['magnetic'].apply((self.field.evenFieldX['flux'], self.field.evenFieldY['flux']), deltaT, t)
         elif self.mode == 'TEz':
-            self.field.evenFieldX['field'], self.field.evenFieldY['field'] = self.material['electric'].apply((self.field.evenFieldX['flux'], self.field.evenFieldY['flux']),deltaT)
+            self.field.evenFieldX['field'], self.field.evenFieldY['field'] = self.material['electric'].apply((self.field.evenFieldX['flux'], self.field.evenFieldY['flux']), deltaT, t)
