@@ -72,7 +72,7 @@ class solver:
         self.field.oddFieldY['flux'][1:,1:] -= ky*(self.field.evenFieldX['field'][1:,1:] - self.field.evenFieldX['field'][1:,:-1])
 
         # apply sources
-        self.field.oddFieldX['flux'], self.field.oddFieldY['flux'] = self.source.apply((self.field.oddFieldX['flux'], self.field.oddFieldY['flux'], deltaT, t)
+        self.field.oddFieldX['flux'], self.field.oddFieldY['flux'] = self.source.apply((self.field.oddFieldX['flux'], self.field.oddFieldY['flux']), deltaT, t)
 
         # apply material
         if self.mode == 'TMz':
