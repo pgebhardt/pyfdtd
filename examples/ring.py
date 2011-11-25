@@ -6,6 +6,7 @@ import matplotlib.colors as colors
 import pyfdtd
 
 # source function
+@pyfdtd.source
 def f(t):
     x = t - 1000e-12
     return 1.0e3*math.exp(-x**2/(2.0*200.0e-12**2))*math.cos(2.0*math.pi*20e9*x)
@@ -24,7 +25,7 @@ solver = pyfdtd.solver(pyfdtd.field(0.4, 0.4, deltaX=0.001))
 solver.material['electric'][ring] = pyfdtd.material.epsilon(sigma=59.1e6)
 
 # add source
-solver.ports.append(pyfdtd.port(0.06, 0.2, source=f))
+solver.source[pyfdtd.masks.ellipse(0.06, 0.2, 0.001)] = f
 
 # iterate
 history = solver.solve(5e-9, saveHistory=True)

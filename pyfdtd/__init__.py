@@ -4,3 +4,4 @@ from material import *
 from pml import *
 from solver import *
 from source import *
+import masks
