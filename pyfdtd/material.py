@@ -95,8 +95,8 @@ class material:
             funcX, funcY, mask = layer
 
             # calc field
-            fieldX = funcX(fluxX*mask, deltaT, t) + (1.0-mask)*fieldX
-            fieldY = funcY(fluxY*mask, deltaT, t) + (1.0-mask)*fieldY
+            fieldX = mask*funcX(fluxX, deltaT, t) + (1.0-mask)*fieldX
+            fieldY = mask*funcY(fluxY, deltaT, t) + (1.0-mask)*fieldY
 
         return fieldX, fieldY
 

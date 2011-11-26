@@ -7,16 +7,16 @@ import field as fi
 
 class solver:
     """Solves FDTD equations on given field, with given materials and ports"""
-    def __init__(self, field, mode='TMz', ports=[], boundary=None):
+    def __init__(self, field, mode='TMz'):
         # save arguments
         self.field = field
         self.mode = mode
-        self.ports = ports
 
-        # create material object
-        self.material = {}
+        # create sources
+        self.source = material(field.xSize, field.ySize, field.deltaX, field.deltaY)
 
         # create materials
+        self.material = {}
         self.material['electric'] = material(field.xSize, field.ySize, field.deltaX, field.deltaY)
         self.material['magnetic'] = material(field.xSize, field.ySize, field.deltaX, field.deltaY)
 
@@ -70,10 +70,11 @@ class solver:
         # calc oddField
         self.field.oddFieldX['flux'][1:,1:] += kx*(self.field.evenFieldY['field'][1:,1:] - self.field.evenFieldY['field'][:-1,1:])
         self.field.oddFieldY['flux'][1:,1:] -= ky*(self.field.evenFieldX['field'][1:,1:] - self.field.evenFieldX['field'][1:,:-1])
-         
-        # update ports
-        for port in self.ports:
-            port.update(self.field, deltaT, t)
+
+        # apply sources
+        sourceX, sourceY = self.source.apply((self.field.oddFieldX['flux'], self.field.oddFieldY['flux']), deltaT, t)
+        self.field.oddFieldX['flux'] += sourceX
+        self.field.oddFieldY['flux'] += sourceY
 
         # apply material
         if self.mode == 'TMz':

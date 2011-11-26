@@ -9,23 +9,30 @@ import pyfdtd
 @pyfdtd.source
 def f(t):
     x = t - 1000e-12
-    return 1.0e3*math.exp(-x**2/(2.0*200.0e-12**2))*math.cos(2.0*math.pi*20e9*x)
+    return 40.0*math.exp(-x**2/(2.0*50.0e-12**2))*math.cos(2.0*math.pi*20e9*x)
 
 # material function
-def ring(x, y):
-    if (x-0.2)**2 + (y-0.2)**2 < 0.13**2 or (x-0.2)**2 + (y-0.2)**2 > 0.15**2:
+def surface1(x, y):
+    if x - 0.02*math.sin(2.0*math.pi*8.0*y) - 0.1 > 0.0:
+        return 1.0
+
+    return 0.0
+
+def surface2(x, y):
+    if x - 0.02*math.sin(2.0*math.pi*8.0*y) - 0.08 < 0.0:
         return 1.0
 
     return 0.0
 
 # create solver
-solver = pyfdtd.solver(pyfdtd.field(0.4, 0.4, deltaX=0.001))
+solver = pyfdtd.solver(pyfdtd.field(0.2, 0.4, deltaX=0.001))
 
 # add material
-solver.material['electric'][ring] = pyfdtd.material.epsilon(sigma=59.1e6)
+solver.material['electric'][surface1] = pyfdtd.material.epsilon(sigma=59.1e6)
+solver.material['electric'][surface2] = pyfdtd.material.epsilon(sigma=59.1e6)
 
 # add source
-solver.source[pyfdtd.masks.ellipse(0.06, 0.2, 0.001)] = f
+solver.source[pyfdtd.masks.ellipse(0.1, 0.05, 5, 0.001)] = f
 
 # iterate
 history = solver.solve(5e-9, saveHistory=True)
