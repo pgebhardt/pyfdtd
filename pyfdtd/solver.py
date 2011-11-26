@@ -29,7 +29,7 @@ class solver:
         self.material['electric'].layer.append(p.layer['electric'])
         self.material['magnetic'].layer.append(p.layer['magnetic'])
 
-    def solve(self, duration, starttime=0.0, deltaT=0.0, saveHistory=False, maxHistoryMemory=256e6):
+    def solve(self, duration, starttime=0.0, deltaT=0.0, safeHistory=False, maxHistoryMemory=256e6):
         """Iterates the FDTD algorithm in respect of the pre-defined ports"""
         # calc deltaT
         if deltaT == 0.0:
@@ -37,7 +37,7 @@ class solver:
 
         # create history memory
         history = []
-        if saveHistory:
+        if safeHistory:
             xShape, yShape = self.field.oddFieldX['flux'].shape
             historyInterval = xShape*yShape*duration/(maxHistoryMemory/4.0)
 
@@ -56,7 +56,7 @@ class solver:
             self._step(deltaT, t, kx, ky)
 
             #safe History
-            if saveHistory and t/deltaT % (historyInterval/deltaT) < 1.0:
+            if safeHistory and t/deltaT % (historyInterval/deltaT) < 1.0:
                 history.append(self.field.oddFieldX['field'] + self.field.oddFieldY['field'])
 
             # print progession

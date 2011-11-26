@@ -35,7 +35,7 @@ solver.material['electric'][surface2] = pyfdtd.material.epsilon(sigma=59.1e6)
 solver.source[pyfdtd.masks.ellipse(0.1, 0.05, 5, 0.001)] = f
 
 # iterate
-history = solver.solve(5e-9, saveHistory=True)
+history = solver.solve(5e-9, safeHistory=True)
 
 # show plot
 fig = plt.figure(1)
