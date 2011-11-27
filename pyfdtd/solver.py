@@ -15,6 +15,9 @@ class solver:
         # create sources
         self.source = material(field.xSize, field.ySize, field.deltaX, field.deltaY)
 
+        # create listeners
+        self.listener = []
+
         # create materials
         self.material = {}
         self.material['electric'] = material(field.xSize, field.ySize, field.deltaX, field.deltaY)
@@ -54,6 +57,10 @@ class solver:
         for t in numpy.arange(starttime, starttime + duration, deltaT):
             # do step
             self._step(deltaT, t, kx, ky)
+
+            # call all listeners
+            for listener in self.listener:
+                listener.update(self.field)
 
             #safe History
             if saveHistory and t/deltaT % (historyInterval/deltaT) < 1.0:

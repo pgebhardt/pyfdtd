@@ -45,4 +45,4 @@ class field:
         x, y = int(x/self.deltaX), int(y/self.deltaY)
 
         # return field vector
-        return self.evenFieldX['field'][x, y], self.evenFieldY['field'][x, y], self.oddGridX['field'][x, y] + self.oddGridY['field'][x, y]
+        return self.evenFieldX['field'][x, y], self.evenFieldY['field'][x, y], self.oddFieldX['field'][x, y] + self.oddFieldY['field'][x, y]
