@@ -47,7 +47,6 @@ class solver:
         # create constants
         kx = deltaT/self.field.deltaX
         ky = deltaT/self.field.deltaY
-        S = constants.c0*deltaT/math.sqrt(self.field.deltaX**2 + self.field.deltaY**2)
 
         # apply mode
         if self.mode == 'TEz':
