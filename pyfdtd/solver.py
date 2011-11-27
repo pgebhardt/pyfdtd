@@ -71,7 +71,7 @@ class solver:
                 print '{}%'.format((t-starttime)*100/duration)
 
         # return history
-        return history, deltaT
+        return history
 
     def _step(self, deltaT, t, kx, ky):
         # calc oddField
