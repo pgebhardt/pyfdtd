@@ -28,7 +28,7 @@ solver.material['electric'][ring] = pyfdtd.material.epsilon(sigma=59.1e6)
 solver.source[pyfdtd.masks.ellipse(0.06, 0.2, 0.001)] = f
 
 # iterate
-history = solver.solve(5e-9, safeHistory=True)
+history = solver.solve(5e-9, saveHistory=True)
 
 # show plot
 fig = plt.figure(1)

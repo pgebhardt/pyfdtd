@@ -22,14 +22,14 @@ solver.material['electric'][0.07:0.13,0.05:-0.05] = pyfdtd.material.epsilon()
 solver.source[pyfdtd.masks.ellipse(0.1, 0.1, 0.001)] = f
 
 # iterate
-history = solver.solve(5e-9, safeHistory=True)
+history = solver.solve(5e-9, saveHistory=True)
 
 # show plot
 fig = plt.figure(1)
 
 ims = []
 for f in history:
-    im = plt.imshow(numpy.fabs(f), norm=colors.Normalize(0.0, 10.0))
+    im = plt.imshow(numpy.fabs(f), norm=colors.Normalize(0.0, 20.0))
     ims.append([im])
 
 ani = animation.ArtistAnimation(fig, ims, interval=50)
