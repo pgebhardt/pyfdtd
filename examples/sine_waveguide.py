@@ -42,7 +42,7 @@ fig = plt.figure(1)
 
 ims = []
 for f in history:
-    im = plt.imshow(f, norm=colors.Normalize(-10.0, 10.0))
+    im = plt.imshow(numpy.fabs(f), norm=colors.Normalize(0.0, 10.0))
     ims.append([im])
 
 ani = animation.ArtistAnimation(fig, ims, interval=50)
