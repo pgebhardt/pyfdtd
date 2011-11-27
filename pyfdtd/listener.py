@@ -6,8 +6,14 @@ class listener:
         self.pos = posX, posY
 
         # create value storage
-        self.values = []
+        self.X, self.Y, self.Z = [], [], []
+        self.values = self.X, self.Y, self.Z
 
     def update(self, field):
+        # get value
+        x, y, z = field[self.pos]
+        
         # save value
-        self.values.append(field[self.pos])
+        self.X.append(x)
+        self.Y.append(y)
+        self.Z.append(z)
