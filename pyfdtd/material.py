@@ -68,13 +68,20 @@ class material:
     
         # check if value is a function
         if not isinstance(value, FunctionType):
-            v = copy.deepcopy(value)
-            value = lambda flux, dt, t: v*flux
+            # check if value is a tuple
+            if isinstance(value, tuple):
+                funcX, funcY = value
+            else:
+                v = copy.deepcopy(value)
+                value = lambda flux, dt, t: v*flux
+        else:
+            funcX = value
+            funcY = value
              
         # add new layer
         dictX = defaultdict(lambda : numpy.zeros(shape))
         dictY = defaultdict(lambda : numpy.zeros(shape))
-        self.layer.append((copy.deepcopy(value), copy.deepcopy(value), dictX, dictY, mask))
+        self.layer.append((copy.deepcopy(funcX), copy.deepcopy(funcY), dictX, dictY, mask))
 
     def apply(self, flux, deltaT, t):
         """
