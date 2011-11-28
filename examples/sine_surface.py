@@ -3,10 +3,10 @@ import numpy
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.colors as colors
-import pyfdtd
+from pyfdtd import *
 
 # source function
-@pyfdtd.source
+@source
 def f(t):
     x = t - 1000e-12
     return 1.0e3*math.exp(-x**2/(2.0*200.0e-12**2))*math.cos(2.0*math.pi*20e9*x)
@@ -19,13 +19,13 @@ def surface(x, y):
     return 0.0
 
 # create solver
-solver = pyfdtd.solver(pyfdtd.field(0.4, 0.4, deltaX=0.001))
+solver = solver(field(0.4, 0.4, deltaX=0.001))
 
 # add material
-solver.material['electric'][surface] = pyfdtd.material.epsilon(sigma=59.1e6)
+solver.material['electric'][surface] = material.epsilon(sigma=59.1e6)
 
 # add source
-solver.source[pyfdtd.masks.ellipse(0.1, 0.2, 0.001)] = f
+solver.source[masks.ellipse(0.1, 0.2, 0.001)] = f
 
 # iterate
 history = solver.solve(5e-9, saveHistory=True)
