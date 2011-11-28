@@ -28,9 +28,9 @@ class solver:
         self.material['magnetic'][:,:] = material.mu()
 
         # add pml layer
-        p = pml(field.xSize, field.ySize, field.deltaX, field.deltaY, mode=mode)
-        self.material['electric'].layer.append(p.layer['electric'])
-        self.material['magnetic'].layer.append(p.layer['magnetic'])
+        electric, magnetic, mask = pml(field.xSize, field.ySize, field.deltaX, field.deltaY, mode=mode)
+        self.material['electric'][mask] = electric
+        self.material['magnetic'][mask] = magnetic
 
     def solve(self, duration, starttime=0.0, deltaT=0.0, saveHistory=False, maxHistoryMemory=256e6):
         """Iterates the FDTD algorithm in respect of the pre-defined ports"""

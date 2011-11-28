@@ -51,8 +51,12 @@ class material:
         shape = (self.xSize/self.deltaX, self.ySize/self.deltaY)
         mask = numpy.zeros(shape)
 
-        # check if key is not a function
-        if not isinstance(key, FunctionType):
+        # check if key is a numpy array
+        if isinstance(key, numpy.ndarray):
+            mask = key
+
+        # check if key is a tuple
+        elif isinstance(key, tuple):
             key = material._helper.scale_slice(key, self.deltaX, self.deltaY)
 
             # evaluate slice
