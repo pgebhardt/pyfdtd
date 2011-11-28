@@ -1,5 +1,6 @@
 from types import *
 import copy
+from collections import defaultdict
 import numpy
 from constants import constants
 import field as fi
@@ -47,19 +48,20 @@ class material:
             the flux desity
         """
         # create mask
-        mask = numpy.zeros((self.xSize/self.deltaX, self.ySize/self.deltaY))
+        shape = (self.xSize/self.deltaX, self.ySize/self.deltaY)
+        mask = numpy.zeros(shape)
 
         # check if key is not a function
         if not isinstance(key, FunctionType):
             key = material._helper.scale_slice(key, self.deltaX, self.deltaY)
 
             # evaluate slice
-            ones = numpy.ones((self.xSize/self.deltaX, self.ySize/self.deltaY))
+            ones = numpy.ones(shape)
             mask[key] = ones[key]
 
         else:
             # evaluate mask function
-            mask = numpy.zeros((self.xSize/self.deltaX, self.ySize/self.deltaY))
+            mask = numpy.zeros(shape)
             for x in range(0, int(self.xSize/self.deltaX), 1):
                 for y in range(0, int(self.ySize/self.deltaY), 1):
                     mask[x, y] = key(x*self.deltaX, y*self.deltaY)
@@ -70,7 +72,9 @@ class material:
             value = lambda flux, dt, t: v*flux
              
         # add new layer
-        self.layer.append((copy.deepcopy(value), copy.deepcopy(value), mask))
+        dictX = defaultdict(lambda : numpy.zeros(shape))
+        dictY = defaultdict(lambda : numpy.zeros(shape))
+        self.layer.append((copy.deepcopy(value), copy.deepcopy(value), dictX, dictY, mask))
 
     def apply(self, flux, deltaT, t):
         """
@@ -92,7 +96,7 @@ class material:
 
         # apply all layer
         for layer in self.layer:
-            funcX, funcY, mask = layer
+            funcX, funcY, dictX, dictY, mask = layer
 
             # calc field
             fieldX = mask*funcX(fluxX, deltaT, t) + (1.0-mask)*fieldX
