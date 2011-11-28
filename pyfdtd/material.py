@@ -77,7 +77,7 @@ class material:
                 funcX, funcY = value
             else:
                 v = copy.deepcopy(value)
-                value = lambda flux, dt, t: v*flux
+                value = lambda flux, dt, t, mem: v*flux
         else:
             funcX = value
             funcY = value
@@ -110,8 +110,8 @@ class material:
             funcX, funcY, dictX, dictY, mask = layer
 
             # calc field
-            fieldX = mask*funcX(fluxX, deltaT, t) + (1.0-mask)*fieldX
-            fieldY = mask*funcY(fluxY, deltaT, t) + (1.0-mask)*fieldY
+            fieldX = mask*funcX(fluxX, deltaT, t, dictX) + (1.0-mask)*fieldX
+            fieldY = mask*funcY(fluxY, deltaT, t, dictY) + (1.0-mask)*fieldY
 
         return fieldX, fieldY
 
@@ -130,13 +130,9 @@ class material:
             Conductivity
         """
         # create epsilon function
-        def res(flux, dt, t):              
-            # check if mem already exists
-            if not hasattr(res, 'mem'):
-                res.mem = numpy.zeros(flux.shape)
-
-            field = (1.0/(constants.e0*er + sigma*dt))*(flux - res.mem)
-            res.mem += sigma*field*dt
+        def res(flux, dt, t, mem): 
+            field = (1.0/(constants.e0*er + sigma*dt))*(flux - mem['int'])
+            mem['int'] += sigma*field*dt
             return field
 
         # return function
@@ -154,13 +150,9 @@ class material:
             Relative permeability
         """
         # create mu function
-        def res(flux, dt, t):
-            # check if mem already exists
-            if not hasattr(res, 'mem'):
-                res.mem = numpy.zeros(flux.shape)
-
-            field = (1.0/(constants.mu0*mur + sigma*dt))*(flux - res.mem)
-            res.mem += sigma*field*dt
+        def res(flux, dt, t, mem):
+            field = (1.0/(constants.mu0*mur + sigma*dt))*(flux - mem['int'])
+            mem['int'] += sigma*field*dt
             return field
 
         # return function
