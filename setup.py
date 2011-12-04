@@ -6,7 +6,7 @@ setup(
     description='2D FDTD using numpy',
     long_description='pyfdtd is a 2D electromagnetic fieldsolver in time-domain using numpy.',
     author=', '.join((
-        'Patrik Gebhardt <grosser.knuff@googlemail.com',
+        'Patrik Gebhardt <grosser.knuff@googlemail.com>',
     )),
     author_email='grosser.knuff@googlemail.com',
     url='http://schansge.github.com/pyfdtd/',
@@ -17,7 +17,7 @@ setup(
         "Intended Audience :: Education",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: GNU General Public License (GPL)",
-	    "Operating System :: OS Independent",
+	"Operating System :: OS Independent",
         "Topic :: Scientific/Engineering :: Physics"
     ],
     packages=['pyfdtd'],
