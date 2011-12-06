@@ -81,10 +81,21 @@ class material:
             funcX = value
             funcY = value
              
-        # add new layer
-        dictX = defaultdict(lambda : numpy.zeros(shape))
-        dictY = defaultdict(lambda : numpy.zeros(shape))
-        self.layer.append((funcX, funcY, dictX, dictY, mask))
+        # check for an existing layer
+        for layer in self.layer:
+            # get layer elements
+            fX, fY, dX, dY, m = layer
+            
+            # check for functional quality
+            if fX == funcX and fY == funcY:
+                m = numpy.where(m+mask > 1.0, 1.0, m+mask)
+                self.layer[self.layer.index(layer)] = (fX, fY, dX, dY, m)
+                break
+        else:
+            # add new layer
+            dictX = defaultdict(lambda : numpy.zeros(shape))
+            dictY = defaultdict(lambda : numpy.zeros(shape))
+            self.layer.append((funcX, funcY, dictX, dictY, mask))
 
     def apply(self, flux, deltaT, t):
         """
