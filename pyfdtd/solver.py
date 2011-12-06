@@ -74,8 +74,8 @@ class solver:
 
     def _step(self, deltaT, t, kx, ky):
         # calc oddField
-        self.field.oddFieldX['flux'][1:,1:] += kx*(self.field.evenFieldY['field'][1:,1:] - self.field.evenFieldY['field'][:-1,1:])
-        self.field.oddFieldY['flux'][1:,1:] -= ky*(self.field.evenFieldX['field'][1:,1:] - self.field.evenFieldX['field'][1:,:-1])
+        self.field.oddFieldY['flux'][:-1,:-1] += kx*(self.field.evenFieldY['field'][1:,:-1] - self.field.evenFieldY['field'][:-1,:-1])
+        self.field.oddFieldX['flux'][:-1,:-1] -= ky*(self.field.evenFieldX['field'][:-1,1:] - self.field.evenFieldX['field'][:-1,:-1])
 
         # apply sources
         sourceX, sourceY = self.source.apply((self.field.oddFieldX['flux'], self.field.oddFieldY['flux']), deltaT, t)
@@ -89,7 +89,7 @@ class solver:
             self.field.oddFieldX['field'], self.field.oddFieldY['field'] = self.material['magnetic'].apply((self.field.oddFieldX['flux'], self.field.oddFieldY['flux']), deltaT, t)
 
         # calc evenField
-        self.field.evenFieldX['flux'][:,:-1] -= ky*(self.field.oddFieldX['field'][:,1:] + self.field.oddFieldY['field'][:,1:] - self.field.oddFieldX['field'][:,:-1] - self.field.oddFieldY['field'][:,:-1])
+        self.field.evenFieldX['flux'][:-1,1:-1] -= ky*(self.field.oddFieldX['field'][:,1:] + self.field.oddFieldY['field'][:,1:] - self.field.oddFieldX['field'][:,:-1] - self.field.oddFieldY['field'][:,:-1])
         self.field.evenFieldY['flux'][:-1,:] += kx*(self.field.oddFieldX['field'][1:,:] + self.field.oddFieldY['field'][1:,:] - self.field.oddFieldX['field'][:-1,:] - self.field.oddFieldY['field'][:-1,:])
 
         # apply material
