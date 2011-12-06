@@ -88,7 +88,7 @@ class material:
             
             # check for functional quality
             if fX == funcX and fY == funcY:
-                m = numpy.where(m+mask > 1.0, 1.0, m+mask)
+                m = numpy.where(m > 0.0, m, mask)
                 self.layer[self.layer.index(layer)] = (fX, fY, dX, dY, m)
                 break
         else:
