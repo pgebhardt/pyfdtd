@@ -1,5 +1,4 @@
 from types import *
-import copy
 from collections import defaultdict
 import numpy
 from constants import constants
@@ -85,7 +84,7 @@ class material:
         # add new layer
         dictX = defaultdict(lambda : numpy.zeros(shape))
         dictY = defaultdict(lambda : numpy.zeros(shape))
-        self.layer.append((copy.deepcopy(funcX), copy.deepcopy(funcY), dictX, dictY, mask))
+        self.layer.append((funcX, funcY, dictX, dictY, mask))
 
     def apply(self, flux, deltaT, t):
         """
