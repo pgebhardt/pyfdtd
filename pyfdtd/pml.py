@@ -17,7 +17,7 @@ def pml(xSize, ySize, deltaX, deltaY, thickness=20.0, mode='TMz'):
     c = constants.mu0/constants.e0
 
     # init PML
-    sigmaMax = -(3.0 + 1.0)*constants.e0*constants.c0*math.log(1.0e-8)/(2.0*deltaX*thickness)
+    sigmaMax = -(3.0 + 1.0)*constants.e0*constants.c0*math.log(1.0e-5)/(2.0*deltaX*thickness)
 
     for n in range(0, int(thickness+1.0), 1):
         for j in range(0, int(yShape), 1):
