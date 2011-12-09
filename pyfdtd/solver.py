@@ -89,8 +89,8 @@ class solver:
             self.field.oddFieldX['field'], self.field.oddFieldY['field'] = self.material['magnetic'].apply((self.field.oddFieldX['flux'], self.field.oddFieldY['flux']), deltaT, t)
 
         # calc evenField
-        self.field.evenFieldX['flux'][:-1,1:-1] -= ky*(self.field.oddFieldX['field'][:,1:] + self.field.oddFieldY['field'][:,1:] - self.field.oddFieldX['field'][:,:-1] - self.field.oddFieldY['field'][:,:-1])
-        self.field.evenFieldY['flux'][:-1,:] += kx*(self.field.oddFieldX['field'][1:,:] + self.field.oddFieldY['field'][1:,:] - self.field.oddFieldX['field'][:-1,:] - self.field.oddFieldY['field'][:-1,:])
+        self.field.evenFieldX['flux'][:-1,1:-1] -= ky*(self.field.oddFieldX['field'][:-1,1:-1] + self.field.oddFieldY['field'][:-1,1:-1] - self.field.oddFieldX['field'][:-1,:-2] - self.field.oddFieldY['field'][:-1,:-2])
+        self.field.evenFieldY['flux'][1:-1,:-1] += kx*(self.field.oddFieldX['field'][1:-1,:-1] + self.field.oddFieldY['field'][1:-1,:-1] - self.field.oddFieldX['field'][:-2,:-1] - self.field.oddFieldY['field'][:-2,:-1])
 
         # apply material
         if self.mode == 'TMz':
