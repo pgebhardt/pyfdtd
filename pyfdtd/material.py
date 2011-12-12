@@ -75,8 +75,8 @@ class material:
             if isinstance(value, tuple):
                 funcX, funcY = value
             else:
-                v = copy.deepcopy(value)
-                value = lambda flux, dt, t, mem: v*flux
+                funcX = lambda flux, dt, t, mem: value*flux
+                funcY = funcX
         else:
             funcX = value
             funcY = value
