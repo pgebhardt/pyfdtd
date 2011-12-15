@@ -56,7 +56,7 @@ class material:
 
         # check if key is a tuple
         elif isinstance(key, tuple):
-            key = material._helper.scale_slice(key, self.deltaX, self.deltaY)
+            key = material._scale_slice(key, self.deltaX, self.deltaY)
 
             # evaluate slice
             ones = numpy.ones(shape)
@@ -86,7 +86,7 @@ class material:
             # get layer elements
             fX, fY, dX, dY, m = layer
             
-            # check for functional quality
+            # check for functional equality
             if fX == funcX and fY == funcY:
                 m = numpy.where(m > 0.0, m, mask)
                 self.layer[self.layer.index(layer)] = (fX, fY, dX, dY, m)
@@ -168,26 +168,24 @@ class material:
         # return function
         return res
 
-    class _helper:
+    """
+    Helper functions for internal use
+    """
+    @staticmethod
+    def _scale_slice(key, deltaX, deltaY):
         """
-        Helper functions for internal use
+        Scales the given slices to be used by numpy
         """
-        @staticmethod
-        def scale_slice(key, deltaX, deltaY):
-            """
-            Scales the given slices to be used by numpy
-            """
-            x, y = key
+        x, y = key
 
-            # scale slices
-            if x.start:
-                x = slice(x.start/deltaX, x.stop)
-            if x.stop:
-                x = slice(x.start, x.stop/deltaX)
-            if y.start:
-                y = slice(y.start/deltaY, y.stop)
-            if y.stop:
-                y = slice(y.start, y.stop/deltaY)
+        # scale slices
+        if x.start:
+            x = slice(x.start/deltaX, x.stop)
+        if x.stop:
+            x = slice(x.start, x.stop/deltaX)
+        if y.start:
+            y = slice(y.start/deltaY, y.stop)
+        if y.stop:
+            y = slice(y.start, y.stop/deltaY)
 
-            return x, y
-
+        return x, y
