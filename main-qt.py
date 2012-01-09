@@ -61,12 +61,13 @@ class MainWindow(QtGui.QMainWindow):
         self.history = self.solver.solve(1e-9, saveHistory=True)
 
     def plot(self):
-        ims = []
-        for f in self.history:
-            im = self.ax.imshow(numpy.fabs(f), norm=colors.Normalize(0.0, 10.0))
-            ims.append([im])
-
-        ani = animation.ArtistAnimation(self.fig, ims, interval=50)
+#        ims = []
+#        for f in self.history:
+#            im = self.ax.imshow(numpy.fabs(f), norm=colors.Normalize(0.0, 10.0))
+#            ims.append([im])
+#
+#        ani = animation.ArtistAnimation(self.fig, ims, interval=50)
+        self.ax.imshow(numpy.fabs(self.history[-1]))
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
