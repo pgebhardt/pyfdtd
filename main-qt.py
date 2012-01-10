@@ -37,7 +37,7 @@ class MainWindow(QtGui.QMainWindow):
         # source function
         @source
         def f(t):
-            x = t# - 1000e-12
+            x = t - 1000e-12
             return 40.0*math.exp(-x**2/(2.0*50.0e-12**2))*math.cos(2.0*math.pi*20e9*x)
 
         # mask functions
@@ -64,7 +64,7 @@ class MainWindow(QtGui.QMainWindow):
         self.solver.source[masks.ellipse(0.1, 0.05, 5, 0.001)] = f
 
         # iterate
-        self.history = self.solver.solve(1e-9, saveHistory=True)
+        self.history = self.solver.solve(5e-9, saveHistory=True)
 
     def plot(self):
         if not hasattr(self, 'step'):
@@ -80,14 +80,13 @@ class MainWindow(QtGui.QMainWindow):
         self.step += 1
         if self.step >= len(self.history):
             self.step = 0
-    
-        x, y = self.size().toTuple()
-        #self.resize(x+1, y+1)
-        self.resize(x, y)
 
+        self.canvas.draw()
+            
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
+
     window = MainWindow()
-    window.plot()
     window.show()
+    
     sys.exit(app.exec_())
