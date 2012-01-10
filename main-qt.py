@@ -22,16 +22,22 @@ class MainWindow(QtGui.QMainWindow):
         self.init_FDTD()
         self.init_gui()
 
+        # init timer
+        self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect(self.plot)
+        self.timer.start(50)
+
     def init_gui(self):
         self.fig = Figure(figsize=(600,600))
         self.ax = self.fig.add_subplot(111)
-        self.setCentralWidget(FigureCanvas(self.fig))
+        self.canvas = FigureCanvas(self.fig)
+        self.setCentralWidget(self.canvas)
 
     def init_FDTD(self):
         # source function
         @source
         def f(t):
-            x = t - 1000e-12
+            x = t# - 1000e-12
             return 40.0*math.exp(-x**2/(2.0*50.0e-12**2))*math.cos(2.0*math.pi*20e9*x)
 
         # mask functions
@@ -61,13 +67,23 @@ class MainWindow(QtGui.QMainWindow):
         self.history = self.solver.solve(1e-9, saveHistory=True)
 
     def plot(self):
-#        ims = []
-#        for f in self.history:
-#            im = self.ax.imshow(numpy.fabs(f), norm=colors.Normalize(0.0, 10.0))
-#            ims.append([im])
-#
-#        ani = animation.ArtistAnimation(self.fig, ims, interval=50)
-        self.ax.imshow(numpy.fabs(self.history[-1]))
+        if not hasattr(self, 'step'):
+            self.step = 0
+        
+        # plot current image
+        if not hasattr(self, 'im'):
+            self.im = self.ax.imshow(numpy.fabs(self.history[self.step]), norm=colors.Normalize(0.0, 10.0))
+        else:
+            self.im.set_array(self.history[self.step])
+
+        # increment step
+        self.step += 1
+        if self.step >= len(self.history):
+            self.step = 0
+    
+        x, y = self.size().toTuple()
+        #self.resize(x+1, y+1)
+        self.resize(x, y)
 
 if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
