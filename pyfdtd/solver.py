@@ -57,7 +57,7 @@ class solver:
 
             # call progress function
             if progressfunction:
-                progressfunction(t, self.field)
+                progressfunction(t, deltaT, self.field)
 
     def _step(self, deltaT, t, kx, ky):
         # calc oddField
