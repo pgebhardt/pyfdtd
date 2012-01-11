@@ -18,6 +18,20 @@ def ring(x, y):
 
     return 0.0
 
+# progress function
+history = []
+def progress(t, deltaT, field):
+    xShape, yShape = field.oddFieldX['flux'].shape
+    interval = xShape*yShape*5e-9/(256e6/4.0)
+
+    # save history
+    if t/deltaT % (interval/deltaT) < 1.0:
+        history.append(field.oddFieldX['field'] + field.oddFieldY['field'])
+
+    # print progess
+    if t/deltaT % 100 < 1.0:
+        print '{}'.format(t*100.0/5e-9)
+
 # create solver
 solver = solver(field(0.4, 0.4, deltaX=0.001))
 
@@ -28,7 +42,7 @@ solver.material['electric'][ring] = material.epsilon(sigma=59.1e6)
 solver.source[masks.ellipse(0.06, 0.2, 0.001)] = f
 
 # iterate
-history = solver.solve(5e-9, saveHistory=True)
+solver.solve(5e-9, progressfunction=progress)
 
 # show plot
 fig = plt.figure(1)
