@@ -28,10 +28,19 @@ class MainWindow(QtGui.QMainWindow):
         self.timer.start(50)
 
     def init_gui(self):
-        self.fig = Figure(figsize=(600,600))
+        self.fig = Figure(figsize=(600,600), dpi=72, facecolor=(1,1,1), edgecolor=(0,0,0))
         self.ax = self.fig.add_subplot(111)
         self.canvas = FigureCanvas(self.fig)
-        self.setCentralWidget(self.canvas)
+
+        grid = QtGui.QGridLayout(self)
+        grid.addWidget(self.canvas, 0, 0)
+        grid.addWidget(QtGui.QPushButton('Bla'), 0, 1)
+        self.setLayout(grid)
+
+        self.canvas.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        self.canvas.updateGeometry()
+
+        self.resize(600, 600)
 
     def init_FDTD(self):
         # source function
@@ -64,7 +73,7 @@ class MainWindow(QtGui.QMainWindow):
         self.solver.source[masks.ellipse(0.1, 0.05, 5, 0.001)] = f
 
         # iterate
-        self.history = self.solver.solve(5e-9, saveHistory=True)
+        self.history = self.solver.solve(1e-9, saveHistory=True)
 
     def plot(self):
         if not hasattr(self, 'step'):
