@@ -32,7 +32,7 @@ class solver:
         self.material['electric'][mask] = electric
         self.material['magnetic'][mask] = magnetic
 
-    def solve(self, duration, starttime=0.0, deltaT=0.0, progressfunction=None):
+    def solve(self, duration, starttime=0.0, deltaT=0.0, progressfunction=None, finishfunction=None):
         """Iterates the FDTD algorithm in respect of the pre-defined ports"""
         # calc deltaT
         if deltaT == 0.0:
@@ -58,6 +58,10 @@ class solver:
             # call progress function
             if progressfunction:
                 progressfunction(t, deltaT, self.field)
+
+        # call finish function
+        if finishfunction:
+            finishfunction()
 
     def _step(self, deltaT, t, kx, ky):
         # calc oddField
