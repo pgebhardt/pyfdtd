@@ -1,5 +1,6 @@
 from field import field
 
+
 class listener:
     def __init__(self, posX, posY):
         # save attribute
@@ -12,7 +13,7 @@ class listener:
     def update(self, field):
         # get value
         x, y, z = field[self.pos]
-        
+
         # save value
         self.X.append(x)
         self.Y.append(y)

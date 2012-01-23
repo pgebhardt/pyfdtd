@@ -4,23 +4,24 @@ import numpy
 from constants import constants
 import field as fi
 
+
 class material:
     """
     Container for material layer
-    
+
         **Arguments:**
-        
+
     xSize (required)
         Size of all layers in x direction
-        
+
     ySize (required)
         Size of all layers in y direction
-        
+
     deltaX (required)
         Discretization in x direction
-        
+
     deltaY (required)
-        discretization in y direction    
+        discretization in y direction
     """
     def __init__(self, xSize, ySize, deltaX, deltaY):
         # save atributes
@@ -47,7 +48,7 @@ class material:
             the flux desity
         """
         # create mask
-        shape = (self.xSize/self.deltaX, self.ySize/self.deltaY)
+        shape = (self.xSize / self.deltaX, self.ySize / self.deltaY)
         mask = numpy.zeros(shape)
 
         # check if key is a numpy array
@@ -65,27 +66,27 @@ class material:
         else:
             # evaluate mask function
             mask = numpy.zeros(shape)
-            for x in range(0, int(self.xSize/self.deltaX), 1):
-                for y in range(0, int(self.ySize/self.deltaY), 1):
-                    mask[x, y] = key(x*self.deltaX, y*self.deltaY)
-    
+            for x in range(0, int(self.xSize / self.deltaX), 1):
+                for y in range(0, int(self.ySize / self.deltaY), 1):
+                    mask[x, y] = key(x * self.deltaX, y * self.deltaY)
+
         # check if value is a function
         if not isinstance(value, FunctionType):
             # check if value is a tuple
             if isinstance(value, tuple):
                 funcX, funcY = value
             else:
-                funcX = lambda flux, dt, t, mem: value*flux
+                funcX = lambda flux, dt, t, mem: value * flux
                 funcY = funcX
         else:
             funcX = value
             funcY = value
-             
+
         # check for an existing layer
         for layer in self.layer:
             # get layer elements
             fX, fY, dX, dY, m = layer
-            
+
             # check for functional equality
             if fX == funcX and fY == funcY:
                 m = numpy.where(m > 0.0, m, mask)
@@ -93,8 +94,8 @@ class material:
                 break
         else:
             # add new layer
-            dictX = defaultdict(lambda : numpy.zeros(shape))
-            dictY = defaultdict(lambda : numpy.zeros(shape))
+            dictX = defaultdict(lambda: numpy.zeros(shape))
+            dictY = defaultdict(lambda: numpy.zeros(shape))
             self.layer.append((funcX, funcY, dictX, dictY, mask))
 
     def apply(self, flux, deltaT, t):
@@ -120,8 +121,10 @@ class material:
             funcX, funcY, dictX, dictY, mask = layer
 
             # calc field
-            fieldX = mask*funcX(fluxX, deltaT, t, dictX) + (1.0-mask)*fieldX
-            fieldY = mask*funcY(fluxY, deltaT, t, dictY) + (1.0-mask)*fieldY
+            fieldX = mask * funcX(fluxX, deltaT, t, dictX) \
+                    + (1.0 - mask) * fieldX
+            fieldY = mask * funcY(fluxY, deltaT, t, dictY) \
+                    + (1.0 - mask) * fieldY
 
         return fieldX, fieldY
 
@@ -140,9 +143,10 @@ class material:
             Conductivity
         """
         # create epsilon function
-        def res(flux, dt, t, mem): 
-            field = (1.0/(constants.e0*er + sigma*dt))*(flux - mem['int'])
-            mem['int'] += sigma*field*dt
+        def res(flux, dt, t, mem):
+            field = (1.0 / (constants.e0 * er + sigma * dt)) \
+                    * (flux - mem['int'])
+            mem['int'] += sigma * field * dt
             return field
 
         # return function
@@ -161,8 +165,9 @@ class material:
         """
         # create mu function
         def res(flux, dt, t, mem):
-            field = (1.0/(constants.mu0*mur + sigma*dt))*(flux - mem['int'])
-            mem['int'] += sigma*field*dt
+            field = (1.0 / (constants.mu0 * mur + sigma * dt)) \
+                    * (flux - mem['int'])
+            mem['int'] += sigma * field * dt
             return field
 
         # return function
@@ -180,12 +185,12 @@ class material:
 
         # scale slices
         if x.start:
-            x = slice(x.start/deltaX, x.stop)
+            x = slice(x.start / deltaX, x.stop)
         if x.stop:
-            x = slice(x.start, x.stop/deltaX)
+            x = slice(x.start, x.stop / deltaX)
         if y.start:
-            y = slice(y.start/deltaY, y.stop)
+            y = slice(y.start / deltaY, y.stop)
         if y.stop:
-            y = slice(y.start, y.stop/deltaY)
+            y = slice(y.start, y.stop / deltaY)
 
         return x, y

@@ -1,3 +1,4 @@
 *.pyc
 *.py~
 main.py
+main-qt.py
