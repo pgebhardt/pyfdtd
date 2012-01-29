@@ -3,7 +3,6 @@ import numpy
 from constants import constants
 from material import material
 from pml import pml
-import field as fi
 
 
 class solver:
