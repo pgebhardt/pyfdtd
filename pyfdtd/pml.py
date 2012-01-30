@@ -1,7 +1,5 @@
 import numpy
 import math
-import copy
-import field as fi
 from material import material
 from constants import constants
 

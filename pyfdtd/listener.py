@@ -1,6 +1,3 @@
-from field import field
-
-
 class listener:
     def __init__(self, posX, posY):
         # save attribute

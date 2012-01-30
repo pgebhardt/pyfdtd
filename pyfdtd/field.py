@@ -1,5 +1,6 @@
 import numpy
 
+
 class field:
     """
     Defines the calculation domain by creating even and odd yee grids

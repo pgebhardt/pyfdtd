@@ -1,8 +1,7 @@
-from types import *
+from types import FunctionType
 from collections import defaultdict
 import numpy
 from constants import constants
-import field as fi
 
 
 class material:
