@@ -13,40 +13,39 @@ class solver:
         self.mode = mode
 
         # create sources
-        self.source = material(field.xSize, field.ySize,
-                field.deltaX, field.deltaY)
+        self.source = material(field.size, field.delta)
 
         # create listeners
         self.listener = []
 
         # create materials
         self.material = {}
-        self.material['electric'] = material(field.xSize, field.ySize,
-                field.deltaX, field.deltaY)
-        self.material['magnetic'] = material(field.xSize, field.ySize,
-                field.deltaX, field.deltaY)
+        self.material['electric'] = material(field.size, field.delta)
+        self.material['magnetic'] = material(field.size, field.delta)
 
         # add free space layer
         self.material['electric'][:, :] = material.epsilon()
         self.material['magnetic'][:, :] = material.mu()
 
         # add pml layer
-        electric, magnetic, mask = pml(field.xSize, field.ySize,
-                field.deltaX, field.deltaY, mode=mode)
+        electric, magnetic, mask = pml(field.size, field.delta, mode=mode)
         self.material['electric'][mask] = electric
         self.material['magnetic'][mask] = magnetic
 
     def solve(self, duration, starttime=0.0, deltaT=0.0,
             progressfunction=None, finishfunction=None):
         """Iterates the FDTD algorithm in respect of the pre-defined ports"""
+        # get parameter
+        deltaX, deltaY = self.field.delta
+
         # calc deltaT
         if deltaT == 0.0:
             deltaT = 1.0 / (constants.c0 * math.sqrt(1.0 / \
-                    self.field.deltaX ** 2 + 1.0 / self.field.deltaY ** 2))
+                    deltaX ** 2 + 1.0 / deltaY ** 2))
 
         # create constants
-        kx = deltaT / self.field.deltaX
-        ky = deltaT / self.field.deltaY
+        kx = deltaT / deltaX
+        ky = deltaT / deltaY
 
         # apply mode
         if self.mode == 'TEz':

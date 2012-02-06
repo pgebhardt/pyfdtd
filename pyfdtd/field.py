@@ -8,51 +8,44 @@ class field:
 
         **Arguments:**
 
-    xSize (required)
-        Size in x direction
+    size (required)
+        Size of domain
 
-    ySize (required)
-        Size in y direction
+    delta (required)
+        Discretisation of domain
 
-    deltaX (required)
-        Interval of discretization in x direction
-
-    deltaY
-        Interval if discretization in y direction.
-        If not set, deltaX is used instead.
     """
-    def __init__(self, xSize, ySize, deltaX, deltaY=None):
-        # fill missing parameters
-        if not deltaY:
-            deltaY = deltaX
+    def __init__(self, size, delta):
+        # get values
+        sizeX, sizeY = size
+        deltaX, deltaY = delta
 
         # create even and odd Field
         self.evenFieldX = {
-                'field': numpy.zeros((xSize / deltaX, ySize / deltaY)),
-                'flux': numpy.zeros((xSize / deltaX, ySize / deltaY))}
+                'field': numpy.zeros((sizeX / deltaX, sizeY / deltaY)),
+                'flux': numpy.zeros((sizeX / deltaX, sizeY / deltaY))}
         self.evenFieldY = {
-                'field': numpy.zeros((xSize / deltaX, ySize / deltaY)),
-                'flux': numpy.zeros((xSize / deltaX, ySize / deltaY))}
+                'field': numpy.zeros((sizeX / deltaX, sizeY / deltaY)),
+                'flux': numpy.zeros((sizeX / deltaX, sizeY / deltaY))}
         self.oddFieldX = {
-                'field': numpy.zeros((xSize / deltaX, ySize / deltaY)),
-                'flux': numpy.zeros((xSize / deltaX, ySize / deltaY))}
+                'field': numpy.zeros((sizeX / deltaX, sizeY / deltaY)),
+                'flux': numpy.zeros((sizeX / deltaX, sizeY / deltaY))}
         self.oddFieldY = {
-                'field': numpy.zeros((xSize / deltaX, ySize / deltaY)),
-                'flux': numpy.zeros((xSize / deltaX, ySize / deltaY))}
+                'field': numpy.zeros((sizeX / deltaX, sizeY / deltaY)),
+                'flux': numpy.zeros((sizeX / deltaX, sizeY / deltaY))}
 
         # save all given information
-        self.deltaX = deltaX
-        self.deltaY = deltaY
-        self.xSize = xSize
-        self.ySize = ySize
+        self.size = size
+        self.delta = delta
 
     def __getitem__(self, key):
         """Returns the field vector at the given location"""
         # obtain parameter
         x, y = key
+        deltaX, deltaY = self.delta
 
         # scale x, y
-        x, y = int(x / self.deltaX), int(y / self.deltaY)
+        x, y = int(x / deltaX), int(y / deltaY)
 
         # return field vector
         return (self.evenFieldX['field'][x, y], self.evenFieldY['field'][x, y],

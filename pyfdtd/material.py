@@ -10,24 +10,17 @@ class material:
 
         **Arguments:**
 
-    xSize (required)
-        Size of all layers in x direction
+    size (required)
+        Size of all layers
 
-    ySize (required)
-        Size of all layers in y direction
+    delta (required)
+        Discretization
 
-    deltaX (required)
-        Discretization in x direction
-
-    deltaY (required)
-        discretization in y direction
     """
-    def __init__(self, xSize, ySize, deltaX, deltaY):
+    def __init__(self, size, delta):
         # save atributes
-        self.deltaX = deltaX
-        self.deltaY = deltaY
-        self.xSize = xSize
-        self.ySize = ySize
+        self.size = size
+        self.delta = delta
 
         # create layer list
         self.layer = []
@@ -46,8 +39,12 @@ class material:
             Function or value, which describes the field as a function of
             the flux desity
         """
+        # get size and delta
+        sizeX, sizeY = self.size
+        deltaX, deltaY = self.delta
+
         # create mask
-        shape = (self.xSize / self.deltaX, self.ySize / self.deltaY)
+        shape = (sizeX / deltaX, sizeY / deltaY)
         mask = numpy.zeros(shape)
 
         # check if key is a numpy array
@@ -56,7 +53,7 @@ class material:
 
         # check if key is a tuple
         elif isinstance(key, tuple):
-            key = material._scale_slice(key, self.deltaX, self.deltaY)
+            key = material._scale_slice(key, deltaX, deltaY)
 
             # evaluate slice
             ones = numpy.ones(shape)
@@ -65,9 +62,9 @@ class material:
         else:
             # evaluate mask function
             mask = numpy.zeros(shape)
-            for x in range(0, int(self.xSize / self.deltaX), 1):
-                for y in range(0, int(self.ySize / self.deltaY), 1):
-                    mask[x, y] = key(x * self.deltaX, y * self.deltaY)
+            for x in range(0, int(sizeX / deltaX), 1):
+                for y in range(0, int(sizeY / deltaY), 1):
+                    mask[x, y] = key(x * deltaX, y * deltaY)
 
         # check if value is a function
         if not isinstance(value, FunctionType):
