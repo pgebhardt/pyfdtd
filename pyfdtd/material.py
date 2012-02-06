@@ -22,6 +22,13 @@ class material:
         self.size = size
         self.delta = delta
 
+        # create meshgrid
+        sizeX, sizeY = self.size
+        deltaX, deltaY = self.delta
+        X, Y = numpy.meshgrid(numpy.arange(0.0, sizeX, deltaX),
+                numpy.arange(0.0, sizeY, deltaY))
+        self.meshgrid = X.transpose(), Y.transpose()
+
         # create layer list
         self.layer = []
 
