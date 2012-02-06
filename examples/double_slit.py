@@ -3,11 +3,11 @@ import numpy
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.colors as colors
-from pyfdtd import *
+import pyfdtd
 
 
 # source function
-@source
+@pyfdtd.source
 def f(t):
     x = t - 1000e-12
     return 1.0e3 * math.exp(-x ** 2 / (2.0 * 200.0e-12 ** 2)) * \
@@ -38,8 +38,8 @@ history = []
 
 
 def progress(t, deltaT, field):
-    xShape, yShape = field.oddFieldX['flux'].shape
-    interval = xShape * yShape * 5e-9 / (256e6 / 4.0)
+    shapeX, shapeY = field.oddFieldX['flux'].shape
+    interval = shapeX * shapeY * 5e-9 / (256e6 / 4.0)
 
     # save history
     if t / deltaT % (interval / deltaT) < 1.0:
@@ -50,14 +50,14 @@ def progress(t, deltaT, field):
         print '{}'.format(t * 100.0 / 5e-9)
 
 # create solver
-solver = solver(field(0.2, 0.8, deltaX=0.001))
+solver = pyfdtd.solver(pyfdtd.field((0.2, 0.8), (0.001, 0.001)))
 
 # add material
-solver.material['electric'][slit] = material.epsilon(sigma=59.1e6)
-solver.material['electric'][lense] = material.epsilon(er=2.0)
+solver.material['electric'][slit] = pyfdtd.material.epsilon(sigma=59.1e6)
+solver.material['electric'][lense] = pyfdtd.material.epsilon(er=2.0)
 
 # add source
-solver.source[masks.ellipse(0.1, 0.1, 0.001)] = f
+solver.source[pyfdtd.masks.ellipse(0.1, 0.1, 0.001)] = f
 
 # iterate
 solver.solve(5e-9, progressfunction=progress)
