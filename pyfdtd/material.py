@@ -17,8 +17,8 @@
 
 from types import FunctionType
 from collections import defaultdict
+from scipy import constants
 import numpy
-from constants import constants
 
 
 class material:
@@ -164,7 +164,7 @@ class material:
         """
         # create epsilon function
         def res(flux, dt, t, mem):
-            field = (1.0 / (constants.e0 * er + sigma * dt)) \
+            field = (1.0 / (constants.epsilon_0 * er + sigma * dt)) \
                     * (flux - mem['int'])
             mem['int'] += sigma * field * dt
             return field
@@ -185,7 +185,7 @@ class material:
         """
         # create mu function
         def res(flux, dt, t, mem):
-            field = (1.0 / (constants.mu0 * mur + sigma * dt)) \
+            field = (1.0 / (constants.mu_0 * mur + sigma * dt)) \
                     * (flux - mem['int'])
             mem['int'] += sigma * field * dt
             return field

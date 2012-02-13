@@ -18,7 +18,7 @@
 import numpy
 import math
 from material import material
-from constants import constants
+from scipy import constants
 
 
 def pml(size, delta, thickness=20.0, mode='TMz'):
@@ -37,10 +37,10 @@ def pml(size, delta, thickness=20.0, mode='TMz'):
     mask = numpy.zeros((shapeX, shapeY))
 
     # set constant
-    c = constants.mu0 / constants.e0
+    c = constants.mu_0 / constants.epsilon_0
 
     # init PML
-    sigmaMax = -(3.0 + 1.0) * constants.e0 * constants.c0 \
+    sigmaMax = -(3.0 + 1.0) * constants.epsilon_0 * constants.c \
             * math.log(1.0e-5) / (2.0 * deltaX * thickness)
 
     for n in range(0, int(thickness + 1.0), 1):

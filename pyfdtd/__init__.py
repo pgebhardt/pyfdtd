@@ -15,7 +15,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from constants import constants
 from field import field
 from material import material
 from pml import pml

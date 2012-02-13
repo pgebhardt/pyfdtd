@@ -17,7 +17,7 @@
 
 import math
 import numpy
-from constants import constants
+from scipy import constants
 from material import material
 from pml import pml
 
@@ -57,7 +57,7 @@ class solver:
 
         # calc deltaT
         if deltaT == 0.0:
-            deltaT = 1.0 / (constants.c0 * math.sqrt(1.0 / \
+            deltaT = 1.0 / (constants.c * math.sqrt(1.0 / \
                     deltaX ** 2 + 1.0 / deltaY ** 2))
 
         # create constants
