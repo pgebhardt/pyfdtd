@@ -1,5 +1,6 @@
-# pyfdtd is a simple 2d fdtd using numpy
+# GUI for pyfdtd using PySide
 # Copyright (C) 2012  Patrik Gebhardt
+# Contact: grosser.knuff@googlemail.com
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,12 +15,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-from field import field
-from material import material
-from pml import pml
-from solver import solver
-from source import source
-from listener import listener
-import masks
+from booleanparser import BooleanParser
+from functionparser import source_from_string, material_from_string
 from job import Job

@@ -1,0 +1,3 @@
+[submodule "pyfdtd/job/booleanparser"]
+	path = pyfdtd/job/booleanparser
+	url = git://github.com/schansge/booleanparser.git
