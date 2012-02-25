@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+from types import FunctionType
 from scipy import constants
 from numpy import *
 
@@ -30,27 +31,29 @@ def source_from_string(expression, functions={}):
             return -0.5 * deltaT * value
         return res
 
+    # add pulse to functions
+    functions['pulse'] = pulse
+
     # try parse standart function
-    function = eval(expression, {'pulse': pulse})
+    function = eval(expression, functions)
 
     # check for function type
-    if function is callable:
+    if isinstance(function, FunctionType):
         return function
 
     # if not a source function, create one
-    def res(t):
-        return eval(expression)
+    def res(flux, deltaT, t, mem):
+        return -0.5 * deltaT * eval(expression)
 
-    return pyfdtd.source(res)
+    return res
 
 
 def material_from_string(expression, functions={}):
     # try parse standart functions
-    function = eval(expression, {'epsilon': pyfdtd.material.epsilon,
-        'mu': pyfdtd.material.mu})
+    function = eval(expression, functions)
 
     # check for function type
-    if function is callable:
+    if isinstance(function, FunctionType):
         return function
 
     # if not a material function, create one
