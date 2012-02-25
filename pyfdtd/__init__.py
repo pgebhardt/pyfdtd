@@ -22,4 +22,5 @@ from solver import solver
 from source import source
 from listener import listener
 import masks
+import parser
 from job import Job
