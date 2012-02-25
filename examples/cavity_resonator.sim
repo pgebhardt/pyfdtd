@@ -1,0 +1,36 @@
+{
+    "config": {
+        "delta": [
+            0.001, 
+            0.001
+        ], 
+        "duration": 5e-09, 
+        "size": [
+            0.2, 
+            0.4
+        ]
+    },
+    "listener": [],
+    "material": {
+        "electric": [
+            [
+                "resonator", 
+                "x == x", 
+                "epsilon(sigma=59.1e6)"
+            ], 
+            [
+                "inner", 
+                "x >= 0.07 and x < 0.13 and y >= 0.05 and y < 0.35", 
+                "epsilon()"
+            ]
+        ], 
+        "magnetic": []
+    }, 
+    "source": [
+        [
+            "source", 
+            "(x-0.1)**2 + (y-0.1)**2 < 0.001**2", 
+            "pulse(amplitude=1.0e3, width=200e-12, freq=20e9, offset=1e-9)"
+        ]
+    ]
+}
