@@ -17,4 +17,3 @@
 
 from booleanparser import BooleanParser
 from functionparser import source_from_string, material_from_string
-from job import Job

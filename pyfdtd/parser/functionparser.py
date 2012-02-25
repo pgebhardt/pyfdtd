@@ -16,13 +16,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from lib import pyfdtd
-from types import FunctionType
 from scipy import constants
 from numpy import *
 
 
-def source_from_string(expression):
+def source_from_string(expression, functions={}):
     # standart pulse function
     def pulse(amplitude=1e3, width=200e-12, freq=20e9, offset=1e-9):
         def res(flux, deltaT, t, mem):
@@ -36,7 +34,7 @@ def source_from_string(expression):
     function = eval(expression, {'pulse': pulse})
 
     # check for function type
-    if isinstance(function, FunctionType):
+    if function is callable:
         return function
 
     # if not a source function, create one
@@ -46,13 +44,13 @@ def source_from_string(expression):
     return pyfdtd.source(res)
 
 
-def material_from_string(expression):
+def material_from_string(expression, functions={}):
     # try parse standart functions
     function = eval(expression, {'epsilon': pyfdtd.material.epsilon,
         'mu': pyfdtd.material.mu})
 
     # check for function type
-    if isinstance(function, FunctionType):
+    if function is callable:
         return function
 
     # if not a material function, create one
