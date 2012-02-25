@@ -95,19 +95,3 @@ class Job:
 
         # return new solver
         return sol
-
-# test
-if __name__ == '__main__':
-    # create job
-    job = Job()
-
-    # save job
-    job.save('temp.sim')
-
-    # change job
-    job.config['size'] = (0.2, 0.4)
-    print job.config['size']
-
-    # load job
-    job.load('temp.sim')
-    print job.config['size']
