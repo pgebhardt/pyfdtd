@@ -50,11 +50,11 @@ def progress(t, deltaT, field):
         print '{}'.format(t * 100.0 / 5e-9)
 
 # create solver
-solver = pyfdtd.solver(pyfdtd.field((0.2, 0.8), (0.001, 0.001)))
+solver = pyfdtd.Solver(pyfdtd.Field((0.2, 0.8), (0.001, 0.001)))
 
 # add material
-solver.material['electric'][slit] = pyfdtd.material.epsilon(sigma=59.1e6)
-solver.material['electric'][lense] = pyfdtd.material.epsilon(er=2.0)
+solver.material['electric'][slit] = pyfdtd.Material.epsilon(sigma=59.1e6)
+solver.material['electric'][lense] = pyfdtd.Material.epsilon(er=2.0)
 
 # add source
 solver.source[pyfdtd.masks.ellipse(0.1, 0.1, 0.001)] = f

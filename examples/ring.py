@@ -39,10 +39,10 @@ def progress(t, deltaT, field):
         print '{}'.format(t * 100.0 / 5e-9)
 
 # create solver
-solver = pyfdtd.solver(pyfdtd.field((0.4, 0.4), (0.001, 0.001)))
+solver = pyfdtd.Solver(pyfdtd.Field((0.4, 0.4), (0.001, 0.001)))
 
 # add material
-solver.material['electric'][ring] = pyfdtd.material.epsilon(sigma=59.1e6)
+solver.material['electric'][ring] = pyfdtd.Material.epsilon(sigma=59.1e6)
 
 # add source
 solver.source[pyfdtd.masks.ellipse(0.06, 0.2, 0.001)] = f
