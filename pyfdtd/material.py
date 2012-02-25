@@ -21,7 +21,7 @@ from scipy import constants
 import numpy
 
 
-class material:
+class Material:
     """
     Container for material layer
 
@@ -77,7 +77,7 @@ class material:
 
         # check if key is a tuple
         elif isinstance(key, tuple):
-            key = material._scale_slice(key, deltaX, deltaY)
+            key = Material._scale_slice(key, deltaX, deltaY)
 
             # evaluate slice
             ones = numpy.ones(shape)

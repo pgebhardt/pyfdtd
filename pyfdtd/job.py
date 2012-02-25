@@ -17,10 +17,10 @@
 
 
 import json
-from material import material
-from solver import solver
-from field import field
-from listener import listener
+from material import Material
+from solver import Solver
+from field import Field
+from listener import Listener
 from parser import BooleanParser, material_from_string, source_from_string
 
 
@@ -65,33 +65,33 @@ class Job:
 
     def get_solver(self):
         # create empty solver
-        sol = solver(field(self.config['size'], self.config['delta']))
+        solver = Solver(Field(self.config['size'], self.config['delta']))
 
         # create parser
         parser = BooleanParser()
 
         # get meshgrid
-        x, y = sol.material['electric'].meshgrid
+        x, y = solver.material['electric'].meshgrid
 
         # create materials
         for name, mask, function in self.material['electric']:
-            sol.material['electric'][parser.parse(str(mask), x=x, y=y)] = \
+            solver.material['electric'][parser.parse(str(mask), x=x, y=y)] = \
                     material_from_string(function, {'epsilon':
-                        material.epsilon})
+                        Material.epsilon})
 
         for name, mask, function in self.material['magnetic']:
-            sol.material['magnetic'][parser.parse(str(mask), x=x, y=y)] = \
+            solver.material['magnetic'][parser.parse(str(mask), x=x, y=y)] = \
                     material_from_string(function, {'mu':
-                        material.mu})
+                        Material.mu})
 
         # create source
         for name, mask, function in self.source:
-            sol.source[parser.parse(str(mask), x=x, y=y)] = \
+            solver.source[parser.parse(str(mask), x=x, y=y)] = \
                     source_from_string(function)
 
         # create listener
         for name, x, y in self.listener:
-            sol.listener.append(listener(x, y))
+            solver.listener.append(Listener(x, y))
 
         # return new solver
-        return sol
+        return solver

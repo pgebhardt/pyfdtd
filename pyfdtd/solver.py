@@ -18,11 +18,11 @@
 import math
 import numpy
 from scipy import constants
-from material import material
+from material import Material
 from pml import pml
 
 
-class solver:
+class Solver:
     """Solves FDTD equations on given field, with given materials and ports"""
     def __init__(self, field, mode='TMz'):
         # save arguments
@@ -30,19 +30,19 @@ class solver:
         self.mode = mode
 
         # create sources
-        self.source = material(field.size, field.delta)
+        self.source = Material(field.size, field.delta)
 
         # create listeners
         self.listener = []
 
         # create materials
         self.material = {}
-        self.material['electric'] = material(field.size, field.delta)
-        self.material['magnetic'] = material(field.size, field.delta)
+        self.material['electric'] = Material(field.size, field.delta)
+        self.material['magnetic'] = Material(field.size, field.delta)
 
         # add free space layer
-        self.material['electric'][:, :] = material.epsilon()
-        self.material['magnetic'][:, :] = material.mu()
+        self.material['electric'][:, :] = Material.epsilon()
+        self.material['magnetic'][:, :] = Material.mu()
 
         # add pml layer
         electric, magnetic, mask = pml(field.size, field.delta, mode=mode)

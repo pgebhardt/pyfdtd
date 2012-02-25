@@ -18,7 +18,7 @@
 import numpy
 
 
-class field:
+class Field:
     """
     Defines the calculation domain by creating even and odd yee grids
     for field and flux.

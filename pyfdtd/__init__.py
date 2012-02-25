@@ -15,12 +15,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-from field import field
-from material import material
+from field import Field
+from material import Material
 from pml import pml
-from solver import solver
+from solver import Solver
 from source import source
-from listener import listener
+from listener import Listener
 import masks
 import parser
 from job import Job

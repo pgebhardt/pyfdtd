@@ -15,7 +15,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-class listener:
+class Listener:
     def __init__(self, posX, posY):
         # save attribute
         self.pos = posX, posY

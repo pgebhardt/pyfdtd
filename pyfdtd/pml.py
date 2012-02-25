@@ -17,7 +17,7 @@
 
 import numpy
 import math
-from material import material
+from material import Material
 from scipy import constants
 
 
@@ -71,9 +71,9 @@ def pml(size, delta, thickness=20.0, mode='TMz'):
             mask[i, shapeY - 1 - n] = 1.0
 
     # create layer
-    electric = (material.epsilon(1.0, sigma['electricX']),
-            material.epsilon(1.0, sigma['electricY']))
-    magnetic = (material.mu(1.0, sigma['magneticX']),
-            material.mu(1.0, sigma['magneticY']))
+    electric = (Material.epsilon(1.0, sigma['electricX']),
+            Material.epsilon(1.0, sigma['electricY']))
+    magnetic = (Material.mu(1.0, sigma['magneticX']),
+            Material.mu(1.0, sigma['magneticY']))
 
     return electric, magnetic, mask
