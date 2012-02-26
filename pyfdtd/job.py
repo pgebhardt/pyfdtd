@@ -1,4 +1,4 @@
-# GUI for pyfdtd using PySide
+# pyfdtd is a simple 2d fdtd using numpy
 # Copyright (C) 2012  Patrik Gebhardt
 # Contact: grosser.knuff@googlemail.com
 #
@@ -49,6 +49,9 @@ class Job:
         # close file
         f.close()
 
+        # return self for chaining
+        return self
+
     def save(self, fname):
         # open file
         f = open(fname, 'wb')
@@ -62,6 +65,9 @@ class Job:
 
         # close file
         f.close()
+
+        # return self for chaining
+        return self
 
     def get_solver(self):
         # create empty solver
