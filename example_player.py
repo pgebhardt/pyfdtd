@@ -41,9 +41,7 @@ def main():
             print '{}'.format(t * 100.0 / 5e-9)
 
     # create solver
-    job = pyfdtd.Job()
-    job.load(sys.argv[1])
-
+    job = pyfdtd.Job().load(sys.argv[1])
     solver = job.get_solver()
 
     # iterate
