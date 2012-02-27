@@ -65,14 +65,19 @@ class Solver:
         kx = deltaT / deltaX
         ky = deltaT / deltaY
 
+        # material aliases
+        material1 = 'electric'
+        material2 = 'magnetic'
+
         # apply mode
         if self.mode == 'TEz':
             kx, ky = -ky, -ky
+            material1, material2 = material2, material1
 
         # iterate
         for t in numpy.arange(starttime, starttime + duration, deltaT):
             # do step
-            self._step(deltaT, t, kx, ky)
+            self._step(deltaT, t, kx, ky, material1, material2)
 
             # call all listeners
             for listener in self.listener:
@@ -86,7 +91,7 @@ class Solver:
         if finishfunction:
             finishfunction()
 
-    def _step(self, deltaT, t, kx, ky):
+    def _step(self, deltaT, t, kx, ky, material1, material2):
         # calc oddField
         self.field.oddFieldY['flux'][:-1, :-1] += kx * \
                 (self.field.evenFieldY['field'][1:, :-1] - \
@@ -102,16 +107,10 @@ class Solver:
         self.field.oddFieldY['flux'] += sourceY
 
         # apply material
-        if self.mode == 'TMz':
-            self.field.oddFieldX['field'], self.field.oddFieldY['field'] = \
-                    self.material['electric'].apply(
-                            (self.field.oddFieldX['flux'],
-                                self.field.oddFieldY['flux']), deltaT, t)
-        elif self.mode == 'TEz':
-            self.field.oddFieldX['field'], self.field.oddFieldY['field'] = \
-                    self.material['magnetic'].apply(
-                            (self.field.oddFieldX['flux'],
-                                self.field.oddFieldY['flux']), deltaT, t)
+        self.field.oddFieldX['field'], self.field.oddFieldY['field'] = \
+                self.material[material1].apply(
+                        (self.field.oddFieldX['flux'],
+                            self.field.oddFieldY['flux']), deltaT, t)
 
         # calc evenField
         self.field.evenFieldX['flux'][:-1, 1:-1] -= ky * \
@@ -126,13 +125,7 @@ class Solver:
                 self.field.oddFieldY['field'][:-2, :-1])
 
         # apply material
-        if self.mode == 'TMz':
-            self.field.evenFieldX['field'], self.field.evenFieldY['field'] = \
-                    self.material['magnetic'].apply(
-                            (self.field.evenFieldX['flux'],
-                                self.field.evenFieldY['flux']), deltaT, t)
-        elif self.mode == 'TEz':
-            self.field.evenFieldX['field'], self.field.evenFieldY['field'] = \
-                    self.material['electric'].apply(
-                            (self.field.evenFieldX['flux'],
-                                self.field.evenFieldY['flux']), deltaT, t)
+        self.field.evenFieldX['field'], self.field.evenFieldY['field'] = \
+                self.material[material2].apply(
+                        (self.field.evenFieldX['flux'],
+                            self.field.evenFieldY['flux']), deltaT, t)
