@@ -17,6 +17,7 @@
 
 
 import json
+import numpy
 from material import Material
 from solver import Solver
 from field import Field
@@ -69,10 +70,10 @@ class Job:
         # return self for chaining
         return self
 
-    def get_solver(self, ctx):
+    def get_solver(self, queue):
         # create empty solver
-        solver = Solver(ctx,
-                Field(ctx, self.config['size'], self.config['delta']))
+        solver = Solver(queue,
+                Field(queue, self.config['size'], self.config['delta']))
 
         # create parser
         parser = BooleanParser()
@@ -82,19 +83,21 @@ class Job:
 
         # create materials
         for name, mask, function in self.material['electric']:
-            solver.material['electric'][parser.parse(str(mask), x=x, y=y)] = \
+            solver.material['electric'][numpy.where(parser.parse(str(mask),
+                x=x, y=y), 1.0, 0.0)] = \
                     material_from_string(function, {'epsilon':
                         Material.epsilon})
 
         for name, mask, function in self.material['magnetic']:
-            solver.material['magnetic'][parser.parse(str(mask), x=x, y=y)] = \
+            solver.material['magnetic'][numpy.where(parser.parse(str(mask),
+                x=x, y=y), 1.0, 0.0)] = \
                     material_from_string(function, {'mu':
                         Material.mu})
 
         # create source
         for name, mask, function in self.source:
-            solver.source[parser.parse(str(mask), x=x, y=y)] = \
-                    source_from_string(function)
+            solver.source[numpy.where(parser.parse(str(mask), x=x, y=y), 1.0,
+                0.0)] = source_from_string(function)
 
         # create listener
         for name, x, y in self.listener:
