@@ -44,12 +44,15 @@ def main():
     # create context
     ctx = cl.create_some_context()
 
+    # create queue
+    queue = cl.CommandQueue(ctx)
+
     # create solver
     job = pyfdtd.Job().load(sys.argv[1])
     solver = job.get_solver(ctx)
 
     # iterate
-    solver.solve(job.config['duration'], progressfunction=progress)
+    solver.solve(queue, job.config['duration'], progressfunction=progress)
 
     # show plot
     fig = plt.figure(1)

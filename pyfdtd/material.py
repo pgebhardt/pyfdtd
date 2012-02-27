@@ -19,6 +19,7 @@
 from types import FunctionType
 from collections import defaultdict
 from scipy import constants
+from field import Buffer
 import numpy
 
 
@@ -35,10 +36,11 @@ class Material:
         Discretization
 
     """
-    def __init__(self, size, delta):
+    def __init__(self, ctx, size, delta):
         # save atributes
         self.size = size
         self.delta = delta
+        self.ctx = ctx
 
         # create meshgrid
         sizeX, sizeY = self.size
@@ -115,11 +117,11 @@ class Material:
                 break
         else:
             # add new layer
-            dictX = defaultdict(lambda: numpy.zeros(shape))
-            dictY = defaultdict(lambda: numpy.zeros(shape))
+            dictX = defaultdict(lambda: Buffer(self.ctx, shape))
+            dictY = defaultdict(lambda: Buffer(self.ctx, shape))
             self.layer.append((funcX, funcY, dictX, dictY, mask))
 
-    def apply(self, flux, deltaT, t):
+    def apply(self, queue, flux, field, deltaT, t):
         """
         Calculates the field from the flux density
 
@@ -135,19 +137,25 @@ class Material:
         fluxX, fluxY = flux
 
         # create field
-        fieldX, fieldY = numpy.zeros(fluxX.shape), numpy.zeros(fluxY.shape)
+        fieldX, fieldY = field
+
+        # sync buffer
+        fluxX.to_cl(queue)
+        fluxY.to_cl(queue)
 
         # apply all layer
         for layer in self.layer:
             funcX, funcY, dictX, dictY, mask = layer
 
             # calc field
-            fieldX = mask * funcX(fluxX, deltaT, t, dictX) \
+            fieldX.clarray = mask * funcX(fluxX.clarray, deltaT, t, dictX) \
                     + (1.0 - mask) * fieldX
-            fieldY = mask * funcY(fluxY, deltaT, t, dictY) \
+            fieldY.clarray = mask * funcY(fluxY.clarray, deltaT, t, dictY) \
                     + (1.0 - mask) * fieldY
 
-        return fieldX, fieldY
+        # sync buffer
+        fieldX.to_numpy(queue)
+        fieldY.to_numpy(queue)
 
     @staticmethod
     def epsilon(er=1.0, sigma=0.0):
