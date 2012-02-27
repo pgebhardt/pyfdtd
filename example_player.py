@@ -18,6 +18,7 @@
 
 import sys
 import numpy
+import pyopencl as cl
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import matplotlib.colors as colors
@@ -40,9 +41,12 @@ def main():
         if t / deltaT % 100 < 1.0:
             print '{}'.format(t * 100.0 / 5e-9)
 
+    # create context
+    ctx = cl.create_some_context()
+
     # create solver
     job = pyfdtd.Job().load(sys.argv[1])
-    solver = job.get_solver()
+    solver = job.get_solver(ctx)
 
     # iterate
     solver.solve(job.config['duration'], progressfunction=progress)

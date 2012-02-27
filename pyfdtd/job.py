@@ -69,9 +69,9 @@ class Job:
         # return self for chaining
         return self
 
-    def get_solver(self):
+    def get_solver(self, ctx):
         # create empty solver
-        solver = Solver(Field(self.config['size'], self.config['delta']))
+        solver = Solver(Field(ctx, self.config['size'], self.config['delta']))
 
         # create parser
         parser = BooleanParser()

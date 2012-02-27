@@ -17,6 +17,29 @@
 
 
 import numpy
+import pyopencl as cl
+
+
+def buffer_from_array(a, ctx):
+    return cl.Buffer(ctx,
+            cl.mem_flags.READ_WRITE | cl.mem_flags.COPY_HOST_PTR, hostbuf=a)
+
+
+class Buffer:
+    def __init__(self, ctx, shape):
+        # create numpy array
+        self.narray = numpy.zeros(shape)
+
+        # create cl array
+        self.clarray = buffer_from_array(self.narray, ctx)
+
+    def to_cl(self, queue):
+        # copy numpy to cl
+        cl.enqueue_copy(queue, self.narray, self.clarray)
+
+    def to_numpy(self, queue):
+        # copy cl to numpy
+        cl.enqueue_copy(queue, self.clarray, self.narray)
 
 
 class Field:
@@ -33,24 +56,24 @@ class Field:
         Discretisation of domain
 
     """
-    def __init__(self, size, delta):
+    def __init__(self, ctx, size, delta):
         # get values
         sizeX, sizeY = size
         deltaX, deltaY = delta
 
         # create even and odd Field
         self.evenFieldX = {
-                'field': numpy.zeros((sizeX / deltaX, sizeY / deltaY)),
-                'flux': numpy.zeros((sizeX / deltaX, sizeY / deltaY))}
+                'field': Buffer(ctx, (sizeX / deltaX, sizeY / deltaY)),
+                'flux': Buffer(ctx, (sizeX / deltaX, sizeY / deltaY))}
         self.evenFieldY = {
-                'field': numpy.zeros((sizeX / deltaX, sizeY / deltaY)),
-                'flux': numpy.zeros((sizeX / deltaX, sizeY / deltaY))}
+                'field': Buffer(ctx, (sizeX / deltaX, sizeY / deltaY)),
+                'flux': Buffer(ctx, (sizeX / deltaX, sizeY / deltaY))}
         self.oddFieldX = {
-                'field': numpy.zeros((sizeX / deltaX, sizeY / deltaY)),
-                'flux': numpy.zeros((sizeX / deltaX, sizeY / deltaY))}
+                'field': Buffer(ctx, (sizeX / deltaX, sizeY / deltaY)),
+                'flux': Buffer(ctx, (sizeX / deltaX, sizeY / deltaY))}
         self.oddFieldY = {
-                'field': numpy.zeros((sizeX / deltaX, sizeY / deltaY)),
-                'flux': numpy.zeros((sizeX / deltaX, sizeY / deltaY))}
+                'field': Buffer(ctx, (sizeX / deltaX, sizeY / deltaY)),
+                'flux': Buffer(ctx, (sizeX / deltaX, sizeY / deltaY))}
 
         # save all given information
         self.size = size
@@ -66,5 +89,7 @@ class Field:
         x, y = int(x / deltaX), int(y / deltaY)
 
         # return field vector
-        return (self.evenFieldX['field'][x, y], self.evenFieldY['field'][x, y],
-                self.oddFieldX['field'][x, y] + self.oddFieldY['field'][x, y])
+        return (self.evenFieldX['field'].narray[x, y],
+                self.evenFieldY['field'].narray[x, y],
+                self.oddFieldX['field'].narray[x, y] + \
+                self.oddFieldY['field'].narray[x, y])
