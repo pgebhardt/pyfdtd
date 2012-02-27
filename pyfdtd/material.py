@@ -162,9 +162,9 @@ class Material:
         # create epsilon function
         def res(flux, dt, t, mem):
             field = flux / constants.epsilon_0
-            #field = (1.0 / (constants.epsilon_0 * er + sigma * dt)) \
-            #        * (flux - mem['int'])
-            #mem['int'] += sigma * field * dt
+            field = (1.0 / (constants.epsilon_0 * er + sigma * dt)) \
+                    * (flux - mem['int'])
+            mem['int'] += sigma * field * dt
             return field
 
         # return function
@@ -184,9 +184,9 @@ class Material:
         # create mu function
         def res(flux, dt, t, mem):
             field = flux / constants.mu_0
-            #field = (1.0 / (constants.mu_0 * mur + sigma * dt)) \
-            #        * (flux - mem['int'])
-            #mem['int'] += sigma * field * dt
+            field = (1.0 / (constants.mu_0 * mur + sigma * dt)) \
+                    * (flux - mem['int'])
+            mem['int'] += sigma * field * dt
             return field
 
         # return function
