@@ -20,28 +20,29 @@ import math
 import numpy
 from scipy import constants
 from material import Material
-from field import Buffer
 from pml import pml
 
 
 class Solver:
     """Solves FDTD equations on given field, with given materials and ports"""
-    def __init__(self, ctx, field, mode='TMz'):
+    def __init__(self, queue, field, mode='TMz'):
         # save arguments
         self.field = field
         self.mode = mode
-        self.ctx = ctx
+        self.queue = queue
 
         # create sources
-        self.source = Material(self.ctx, field.size, field.delta)
+        self.source = Material(self.queue, field.size, field.delta)
 
         # create listeners
         self.listener = []
 
         # create materials
         self.material = {}
-        self.material['electric'] = Material(self.ctx, field.size, field.delta)
-        self.material['magnetic'] = Material(self.ctx, field.size, field.delta)
+        self.material['electric'] = Material(self.queue,
+                field.size, field.delta)
+        self.material['magnetic'] = Material(self.queue,
+                field.size, field.delta)
 
         # add free space layer
         self.material['electric'][:, :] = Material.epsilon()
@@ -71,12 +72,6 @@ class Solver:
         material1 = 'electric'
         material2 = 'magnetic'
 
-        # create source Buffer
-        sourceX = Buffer(self.ctx,
-                self.field.oddFieldX['field'].narray.shape)
-        sourceY = Buffer(self.ctx,
-                self.field.oddFieldX['field'].narray.shape)
-
         # apply mode
         if self.mode == 'TEz':
             kx, ky = -ky, -ky
@@ -85,8 +80,7 @@ class Solver:
         # iterate
         for t in numpy.arange(starttime, starttime + duration, deltaT):
             # do step
-            self._step(queue, deltaT, t, kx, ky,
-                    material1, material2, (sourceX, sourceY))
+            self._step(queue, deltaT, t, kx, ky, material1, material2)
 
             # call all listeners
             for listener in self.listener:
@@ -100,7 +94,13 @@ class Solver:
         if finishfunction:
             finishfunction()
 
-    def _step(self, queue, deltaT, t, kx, ky, material1, material2, source):
+    def _step(self, queue, deltaT, t, kx, ky, material1, material2):
+        # sync Buffer
+        self.field.oddFieldX['flux'].to_numpy(queue)
+        self.field.oddFieldY['flux'].to_numpy(queue)
+        self.field.evenFieldX['field'].to_numpy(queue)
+        self.field.evenFieldY['field'].to_numpy(queue)
+
         # calc oddField
         self.field.oddFieldY['flux'].narray[:-1, :-1] += kx * \
                 (self.field.evenFieldY['field'].narray[1:, :-1] - \
@@ -109,23 +109,31 @@ class Solver:
                 (self.field.evenFieldX['field'].narray[:-1, 1:] - \
                 self.field.evenFieldX['field'].narray[:-1, :-1])
 
+        # sync Buffer
+        self.field.oddFieldX['flux'].to_cl(queue)
+        self.field.oddFieldY['flux'].to_cl(queue)
+
         # apply sources
-        #sourceX, sourceY = source
-        #self.source.apply(queue,
-        #        (self.field.oddFieldX['flux'], self.field.oddFieldY['flux']),
-        #        (sourceX, sourceY), deltaT, t)
+        sourceX, sourceY = self.source.apply(queue,
+                (self.field.oddFieldX['flux'], self.field.oddFieldY['flux']),
+                deltaT, t)
 
-        #sourceX.to_numpy()
-        #sourceY.to_numpy()
-
-        #self.field.oddFieldX['flux'].narray += sourceX.narray
-        #self.field.oddFieldY['flux'].narray += sourceY.narray
+        self.field.oddFieldX['flux'].clarray += sourceX
+        self.field.oddFieldY['flux'].clarray += sourceY
 
         # apply material
-        self.material[material1].apply(queue,
-                (self.field.oddFieldX['flux'], self.field.oddFieldY['flux']),
-                (self.field.oddFieldX['field'], self.field.oddFieldY['field']),
-                deltaT, t)
+        (self.field.oddFieldX['field'].clarray,
+            self.field.oddFieldY['field'].clarray) = \
+                self.material[material1].apply(queue,
+                    (self.field.oddFieldX['flux'],
+                        self.field.oddFieldY['flux']),
+                        deltaT, t)
+
+        # sync Buffer
+        self.field.evenFieldX['flux'].to_numpy(queue)
+        self.field.evenFieldY['flux'].to_numpy(queue)
+        self.field.oddFieldX['field'].to_numpy(queue)
+        self.field.oddFieldY['field'].to_numpy(queue)
 
         # calc evenField
         self.field.evenFieldX['flux'].narray[:-1, 1:-1] -= ky * \
@@ -133,14 +141,20 @@ class Solver:
                 self.field.oddFieldY['field'].narray[:-1, 1:-1] - \
                 self.field.oddFieldX['field'].narray[:-1, :-2] - \
                 self.field.oddFieldY['field'].narray[:-1, :-2])
-        self.field.evenFieldY['flux'][1:-1, :-1] += kx * \
+        self.field.evenFieldY['flux'].narray[1:-1, :-1] += kx * \
                 (self.field.oddFieldX['field'].narray[1:-1, :-1] + \
                 self.field.oddFieldY['field'].narray[1:-1, :-1] - \
                 self.field.oddFieldX['field'].narray[:-2, :-1] - \
                 self.field.oddFieldY['field'].narray[:-2, :-1])
 
+        # sync Buffer
+        self.field.evenFieldX['flux'].to_cl(queue)
+        self.field.evenFieldY['flux'].to_cl(queue)
+
         # apply material
-        self.material[material2].apply(queue,
-                (self.field.oddFieldX['flux'], self.field.oddFieldY['flux']),
-                (self.field.oddFieldX['field'], self.field.oddFieldY['field']),
-                deltaT, t)
+        (self.field.evenFieldX['field'].clarray,
+            self.field.evenFieldY['field'].clarray) = \
+                self.material[material2].apply(queue,
+                    (self.field.evenFieldX['flux'],
+                        self.field.evenFieldY['flux']),
+                        deltaT, t)
