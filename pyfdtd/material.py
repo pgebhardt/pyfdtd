@@ -19,7 +19,8 @@
 from types import FunctionType
 from collections import defaultdict
 from scipy import constants
-from field import Buffer, buffer_from_array
+import pyopencl as cl
+import pyopencl.array as clarray
 import numpy
 
 
@@ -36,11 +37,11 @@ class Material:
         Discretization
 
     """
-    def __init__(self, ctx, size, delta):
+    def __init__(self, queue, size, delta):
         # save atributes
         self.size = size
         self.delta = delta
-        self.ctx = ctx
+        self.queue = queue
 
         # create meshgrid
         sizeX, sizeY = self.size
@@ -106,15 +107,14 @@ class Material:
             funcY = value
 
         # add new layer
-        mask = buffer_from_array(mask, self.ctx)
-        print mask
-        dictX = defaultdict(lambda: buffer_from_array(numpy.zeros(shape),
-            self.ctx))
-        dictY = defaultdict(lambda: buffer_from_array(numpy.zeros(shape),
-            self.ctx))
+        mask = clarray.to_device(self.queue, mask)
+        dictX = defaultdict(lambda: clarray.to_device(self.queue,
+            numpy.zeros(shape)))
+        dictY = defaultdict(lambda: clarray.to_device(self.queue,
+            numpy.zeros(shape)))
         self.layer.append((funcX, funcY, dictX, dictY, mask))
 
-    def apply(self, queue, flux, field, deltaT, t):
+    def apply(self, queue, flux, deltaT, t):
         """
         Calculates the field from the flux density
 
@@ -129,26 +129,21 @@ class Material:
         # get flux
         fluxX, fluxY = flux
 
-        # create field
-        fieldX, fieldY = field
-
-        # sync buffer
-        fluxX.to_cl(queue)
-        fluxY.to_cl(queue)
+        fieldX = clarray.to_device(queue, numpy.zeros(fluxX.narray.shape))
+        fieldY = clarray.to_device(queue, numpy.zeros(fluxX.narray.shape))
 
         # apply all layer
         for layer in self.layer:
             funcX, funcY, dictX, dictY, mask = layer
 
             # calc field
-            fieldX.clarray = mask * funcX(fluxX.clarray, deltaT, t, dictX) \
-                    + (1.0 - mask) * fieldX.clarray
-            fieldY.clarray = mask * funcY(fluxY.clarray, deltaT, t, dictY) \
-                    + (1.0 - mask) * fieldY.clarray
+            fieldX = mask * funcX(fluxX.clarray, deltaT, t, dictX) \
+                + (1.0 - mask) * fieldX
 
-        # sync buffer
-        fieldX.to_numpy(queue)
-        fieldY.to_numpy(queue)
+            fieldY = mask * funcY(fluxY.clarray, deltaT, t, dictY) \
+                + (1.0 - mask) * fieldY
+
+        return fieldX, fieldY
 
     @staticmethod
     def epsilon(er=1.0, sigma=0.0):
@@ -166,9 +161,10 @@ class Material:
         """
         # create epsilon function
         def res(flux, dt, t, mem):
-            field = (1.0 / (constants.epsilon_0 * er + sigma * dt)) \
-                    * (flux - mem['int'])
-            mem['int'] += sigma * field * dt
+            field = flux / constants.epsilon_0
+            #field = (1.0 / (constants.epsilon_0 * er + sigma * dt)) \
+            #        * (flux - mem['int'])
+            #mem['int'] += sigma * field * dt
             return field
 
         # return function
@@ -187,9 +183,10 @@ class Material:
         """
         # create mu function
         def res(flux, dt, t, mem):
-            field = (1.0 / (constants.mu_0 * mur + sigma * dt)) \
-                    * (flux - mem['int'])
-            mem['int'] += sigma * field * dt
+            field = flux / constants.mu_0
+            #field = (1.0 / (constants.mu_0 * mur + sigma * dt)) \
+            #        * (flux - mem['int'])
+            #mem['int'] += sigma * field * dt
             return field
 
         # return function
