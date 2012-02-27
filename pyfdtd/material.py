@@ -19,7 +19,7 @@
 from types import FunctionType
 from collections import defaultdict
 from scipy import constants
-from field import Buffer
+from field import Buffer, buffer_from_array
 import numpy
 
 
@@ -105,21 +105,14 @@ class Material:
             funcX = value
             funcY = value
 
-        # check for an existing layer
-        for layer in self.layer:
-            # get layer elements
-            fX, fY, dX, dY, m = layer
-
-            # check for functional equality
-            if fX == funcX and fY == funcY:
-                m = numpy.where(m > 0.0, m, mask)
-                self.layer[self.layer.index(layer)] = (fX, fY, dX, dY, m)
-                break
-        else:
-            # add new layer
-            dictX = defaultdict(lambda: Buffer(self.ctx, shape))
-            dictY = defaultdict(lambda: Buffer(self.ctx, shape))
-            self.layer.append((funcX, funcY, dictX, dictY, mask))
+        # add new layer
+        mask = buffer_from_array(mask, self.ctx)
+        print mask
+        dictX = defaultdict(lambda: buffer_from_array(numpy.zeros(shape),
+            self.ctx))
+        dictY = defaultdict(lambda: buffer_from_array(numpy.zeros(shape),
+            self.ctx))
+        self.layer.append((funcX, funcY, dictX, dictY, mask))
 
     def apply(self, queue, flux, field, deltaT, t):
         """
@@ -149,9 +142,9 @@ class Material:
 
             # calc field
             fieldX.clarray = mask * funcX(fluxX.clarray, deltaT, t, dictX) \
-                    + (1.0 - mask) * fieldX
+                    + (1.0 - mask) * fieldX.clarray
             fieldY.clarray = mask * funcY(fluxY.clarray, deltaT, t, dictY) \
-                    + (1.0 - mask) * fieldY
+                    + (1.0 - mask) * fieldY.clarray
 
         # sync buffer
         fieldX.to_numpy(queue)

@@ -71,7 +71,8 @@ class Job:
 
     def get_solver(self, ctx):
         # create empty solver
-        solver = Solver(Field(ctx, self.config['size'], self.config['delta']))
+        solver = Solver(ctx,
+                Field(ctx, self.config['size'], self.config['delta']))
 
         # create parser
         parser = BooleanParser()
