@@ -50,7 +50,7 @@ def main():
 
     # create solver
     job = pyfdtd.Job().load(sys.argv[1])
-    solver = job.get_solver(queue)
+    solver = job.get_solver(ctx, queue)
 
     # iterate
     solver.solve(queue, job.config['duration'], progressfunction=progress)

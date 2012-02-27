@@ -70,9 +70,9 @@ class Job:
         # return self for chaining
         return self
 
-    def get_solver(self, queue):
+    def get_solver(self, ctx, queue):
         # create empty solver
-        solver = Solver(queue,
+        solver = Solver(ctx, queue,
                 Field(queue, self.config['size'], self.config['delta']))
 
         # create parser

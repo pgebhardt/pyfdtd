@@ -18,11 +18,12 @@
 
 import numpy
 import math
+import pyopencl.array as clarray
 from material import Material
 from scipy import constants
 
 
-def pml(size, delta, thickness=20.0, mode='TMz'):
+def pml(queue, size, delta, thickness=20.0, mode='TMz'):
     """creates a perfectly matched layer as surounding boundary conditions"""
     # get patameter
     sizeX, sizeY = size
@@ -72,9 +73,11 @@ def pml(size, delta, thickness=20.0, mode='TMz'):
             mask[i, shapeY - 1 - n] = 1.0
 
     # create layer
-    electric = (Material.epsilon(1.0, sigma['electricX']),
-            Material.epsilon(1.0, sigma['electricY']))
-    magnetic = (Material.mu(1.0, sigma['magneticX']),
-            Material.mu(1.0, sigma['magneticY']))
+    electric = (
+        Material.epsilon(1.0, clarray.to_device(queue, sigma['electricX'])),
+        Material.epsilon(1.0, clarray.to_device(queue, sigma['electricY'])))
+    magnetic = (
+        Material.mu(1.0, clarray.to_device(queue, sigma['magneticX'])),
+        Material.mu(1.0, clarray.to_device(queue, sigma['magneticY'])))
 
     return electric, magnetic, mask

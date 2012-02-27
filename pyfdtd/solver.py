@@ -25,10 +25,11 @@ from pml import pml
 
 class Solver:
     """Solves FDTD equations on given field, with given materials and ports"""
-    def __init__(self, queue, field, mode='TMz'):
+    def __init__(self, ctx, queue, field, mode='TMz'):
         # save arguments
         self.field = field
         self.mode = mode
+        self.ctx = ctx
         self.queue = queue
 
         # create sources
@@ -49,9 +50,10 @@ class Solver:
         self.material['magnetic'][:, :] = Material.mu()
 
         # add pml layer
-        #electric, magnetic, mask = pml(field.size, field.delta, mode=mode)
-        #self.material['electric'][mask] = electric
-        #self.material['magnetic'][mask] = magnetic
+        electric, magnetic, mask = pml(self.queue,
+                field.size, field.delta, mode=mode)
+        self.material['electric'][mask] = electric
+        self.material['magnetic'][mask] = magnetic
 
     def solve(self, queue, duration, starttime=0.0, deltaT=0.0,
             progressfunction=None, finishfunction=None):
