@@ -28,7 +28,7 @@ def source_from_string(expression, functions={}):
             value = amplitude * exp(-(t - offset) ** 2 / (2 * width ** 2)) * \
                     cos(2 * pi * freq * (t - offset))
 
-            return -0.5 * deltaT * value
+            return 0.0 * flux + -0.5 * deltaT * value
         return res
 
     # add pulse to functions
@@ -43,7 +43,7 @@ def source_from_string(expression, functions={}):
 
     # if not a source function, create one
     def res(flux, deltaT, t, mem):
-        return -0.5 * deltaT * eval(expression)
+        return 0.0 * flux + -0.5 * deltaT * eval(expression)
 
     return res
 
