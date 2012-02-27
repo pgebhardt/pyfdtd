@@ -30,12 +30,13 @@ def main():
     history = []
 
     def progress(t, deltaT, field):
-        xShape, yShape = field.oddFieldX['flux'].shape
+        xShape, yShape = field.oddFieldX['flux'].narray.shape
         interval = xShape * yShape * 5e-9 / (256e6 / 4.0)
 
         # save history
         if t / deltaT % (interval / deltaT) < 1.0:
-            history.append(field.oddFieldX['field'] + field.oddFieldY['field'])
+            history.append((field.oddFieldX['field'].clarray + \
+                    field.oddFieldY['field'].clarray).get())
 
         # print progess
         if t / deltaT % 100 < 1.0:
@@ -49,7 +50,7 @@ def main():
 
     # create solver
     job = pyfdtd.Job().load(sys.argv[1])
-    solver = job.get_solver(ctx)
+    solver = job.get_solver(queue)
 
     # iterate
     solver.solve(queue, job.config['duration'], progressfunction=progress)
