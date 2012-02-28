@@ -34,16 +34,16 @@ class Solver:
         self.queue = queue
 
         # create sources
-        self.source = Material(self.queue, field.size, field.delta)
+        self.source = Material(self.ctx, self.queue, field.size, field.delta)
 
         # create listeners
         self.listener = []
 
         # create materials
         self.material = {}
-        self.material['electric'] = Material(self.queue,
+        self.material['electric'] = Material(self.ctx, self.queue,
                 field.size, field.delta)
-        self.material['magnetic'] = Material(self.queue,
+        self.material['magnetic'] = Material(self.ctx, self.queue,
                 field.size, field.delta)
 
         # add free space layer
@@ -61,7 +61,7 @@ class Solver:
 
     def create_programs(self):
         # open file
-        f = open('kernel.cl', 'r')
+        f = open('./pyfdtd/solver_kernel.cl', 'r')
 
         # read string
         programmString = f.read()

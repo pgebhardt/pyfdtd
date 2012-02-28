@@ -37,10 +37,11 @@ class Material:
         Discretization
 
     """
-    def __init__(self, queue, size, delta):
+    def __init__(self, ctx, queue, size, delta):
         # save atributes
         self.size = size
         self.delta = delta
+        self.ctx = ctx
         self.queue = queue
 
         # create meshgrid
@@ -52,6 +53,31 @@ class Material:
 
         # create layer list
         self.layer = []
+
+        # create programs
+        self.create_programs()
+
+    def create_programs(self):
+        # open file
+        f = open('./pyfdtd/material_kernel.cl', 'r')
+
+        # read string
+        programmString = f.read()
+
+        # create program
+        self.program = cl.Program(self.ctx, programmString)
+
+        # build
+        try:
+            self.program.build()
+        except:
+            print("Error:")
+            print(self.program.get_build_info(self.ctx.devices[0],
+                cl.program_build_info.LOG))
+            raise
+        finally:
+            # close file
+            f.close()
 
     def __setitem__(self, key, value):
         """
@@ -135,12 +161,13 @@ class Material:
         for layer in self.layer:
             funcX, funcY, dictX, dictY, mask = layer
 
-            # calc field
-            fieldX = mask * funcX(fluxX, deltaT, t, dictX) \
-                + (1.0 - mask) * fieldX
+            self.program.apply(self.queue, fieldX.shape, None,
+                    fieldX.data, funcX(fluxX, deltaT, t, dictX).data,
+                    mask.data)
 
-            fieldY = mask * funcY(fluxY, deltaT, t, dictY) \
-                + (1.0 - mask) * fieldY
+            self.program.apply(self.queue, fieldY.shape, None,
+                    fieldY.data, funcX(fluxY, deltaT, t, dictY).data,
+                    mask.data)
 
         return fieldX, fieldY
 
