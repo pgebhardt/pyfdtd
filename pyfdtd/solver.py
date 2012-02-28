@@ -60,18 +60,14 @@ class Solver:
         self.create_programs()
 
     def create_programs(self):
-        self.program = cl.Program(self.ctx,
-                """__kernel void oddFieldX(""" + \
-                """__global float* oddFieldX,""" + \
-                """__global const float* evenFieldX)""" + \
-                """{""" + \
-                """    int x = get_global_id(0);""" + \
-                """    int y_size = get_global_size(1);""" + \
-                """    int y = get_global_id(1);""" + \
-                """    oddFieldX[x*y_size + y] += """ + \
-                """        evenFieldX[x*y_size + y+1] + """ + \
-                """        evenFieldX[x*y_size + y];""" + \
-                """}""")
+        # open file
+        f = open('kernel.cl', 'r')
+
+        # read string
+        programmString = f.read()
+
+        # create program
+        self.program = cl.Program(self.ctx, programmString)
 
         # build
         try:
@@ -81,6 +77,9 @@ class Solver:
             print(self.program.get_build_info(self.ctx.devices[0],
                 cl.program_build_info.LOG))
             raise
+        finally:
+            # close file
+            f.close()
 
     def solve(self, queue, duration, starttime=0.0, deltaT=0.0,
             progressfunction=None, finishfunction=None):
@@ -140,11 +139,16 @@ class Solver:
                 self.field.evenFieldX['field'].narray[:-1, :-1])
 
         shapeX, shapeY = self.field.oddFieldX['flux'].narray.shape
-        self.program.oddFieldX(self.queue, (shapeX - 1, shapeY - 1),
+        event = self.program.oddFieldX(self.queue, (shapeX - 1, shapeY - 1),
                 None, self.field.oddFieldX['flux'].clarray.data,
-                self.field.evenFieldX['field'].clarray.data)
+                self.field.evenFieldX['field'].clarray.data, numpy.float64(ky))
 
-        print self.field.oddFieldX['flux'].clarray.get()[100, 100]
+        event.wait()
+
+        print 'cl field: {}'.format(self.field.evenFieldX['field'].clarray.get()[100, 100])
+        print 'np field: {}'.format(self.field.evenFieldX['field'].narray[100, 100])
+        print 'cl flux: {}'.format(self.field.oddFieldX['flux'].clarray.get()[100, 100])
+        print 'np flux: {}'.format(self.field.oddFieldX['flux'].narray[100, 100])
 
         # sync Buffer
         self.field.oddFieldX['flux'].to_cl(queue)

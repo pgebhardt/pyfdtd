@@ -77,7 +77,7 @@ class Material:
 
         # check if key is a numpy array
         if isinstance(key, numpy.ndarray):
-            mask = key
+            mask = numpy.float64(key)
 
         # check if key is a tuple
         elif isinstance(key, tuple):
@@ -89,7 +89,6 @@ class Material:
 
         else:
             # evaluate mask function
-            mask = numpy.zeros(shape)
             for x in range(0, int(sizeX / deltaX), 1):
                 for y in range(0, int(sizeY / deltaY), 1):
                     mask[x, y] = key(x * deltaX, y * deltaY)
