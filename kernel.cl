@@ -34,3 +34,25 @@ __kernel void oddFieldY(__global double* oddFieldY, __global double* evenFieldY,
 
     oddFieldY[x*y_size + y] += kx * (evenFieldY[(x+1)*y_size + y] - evenFieldY[x*y_size + y]);
 }
+
+__kernel void evenFieldX(__global double* evenFieldX, __global double* oddFieldX,
+                                  __global double* oddFieldY, double ky)
+{
+    int x = get_global_id(0);
+    int y = get_global_id(1) + 1;
+    int y_size = get_global_size(1) + 2;
+
+    evenFieldX[x*y_size + y] -= ky * (oddFieldX[x*y_size + y] + oddFieldY[x*y_size + y] -
+                        oddFieldX[x*y_size + y-1] - oddFieldY[x*y_size + y-1]);
+}
+
+__kernel void evenFieldY(__global double* evenFieldY, __global double* oddFieldX,
+                                  __global double* oddFieldY, double kx)
+{
+    int x = get_global_id(0) + 1;
+    int y = get_global_id(1);
+    int y_size = get_global_size(1) + 1;
+
+    evenFieldY[x*y_size + y] += kx * (oddFieldX[x*y_size + y] + oddFieldY[x*y_size + y] -
+                        oddFieldX[(x-1)*y_size + y] - oddFieldY[(x-1)*y_size + y]);
+}
