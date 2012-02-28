@@ -123,14 +123,14 @@ class Solver:
             finishfunction()
 
     def _step(self, queue, deltaT, t, kx, ky, material1, material2):
-        shapeX, shapeY = self.field.oddFieldX['flux'].narray.shape
+        shapeX, shapeY = self.field.oddFieldX['flux'].shape
         eventX = self.program.oddFieldX(self.queue, (shapeX - 1, shapeY - 1),
-                None, self.field.oddFieldX['flux'].clarray.data,
-                self.field.evenFieldX['field'].clarray.data, numpy.float64(ky))
+                None, self.field.oddFieldX['flux'].data,
+                self.field.evenFieldX['field'].data, numpy.float64(ky))
 
         eventY = self.program.oddFieldY(self.queue, (shapeX - 1, shapeY - 1),
-                None, self.field.oddFieldY['flux'].clarray.data,
-                self.field.evenFieldY['field'].clarray.data, numpy.float64(kx))
+                None, self.field.oddFieldY['flux'].data,
+                self.field.evenFieldY['field'].data, numpy.float64(kx))
 
         eventX.wait()
         eventY.wait()
@@ -140,33 +140,33 @@ class Solver:
                 (self.field.oddFieldX['flux'], self.field.oddFieldY['flux']),
                 deltaT, t)
 
-        self.field.oddFieldX['flux'].clarray += sourceX
-        self.field.oddFieldY['flux'].clarray += sourceY
+        self.field.oddFieldX['flux'] += sourceX
+        self.field.oddFieldY['flux'] += sourceY
 
         # apply material
-        (self.field.oddFieldX['field'].clarray,
-            self.field.oddFieldY['field'].clarray) = \
+        (self.field.oddFieldX['field'],
+            self.field.oddFieldY['field']) = \
                 self.material[material1].apply(queue,
                     (self.field.oddFieldX['flux'],
                         self.field.oddFieldY['flux']),
                         deltaT, t)
 
         eventX = self.program.evenFieldX(self.queue, (shapeX - 1, shapeY - 2),
-                None, self.field.evenFieldX['flux'].clarray.data,
-                self.field.oddFieldX['field'].clarray.data,
-                self.field.oddFieldY['field'].clarray.data, numpy.float64(ky))
+                None, self.field.evenFieldX['flux'].data,
+                self.field.oddFieldX['field'].data,
+                self.field.oddFieldY['field'].data, numpy.float64(ky))
 
         eventY = self.program.evenFieldY(self.queue, (shapeX - 2, shapeY - 1),
-                None, self.field.evenFieldY['flux'].clarray.data,
-                self.field.oddFieldX['field'].clarray.data,
-                self.field.oddFieldY['field'].clarray.data, numpy.float64(kx))
+                None, self.field.evenFieldY['flux'].data,
+                self.field.oddFieldX['field'].data,
+                self.field.oddFieldY['field'].data, numpy.float64(kx))
 
         eventX.wait()
         eventY.wait()
 
         # apply material
-        (self.field.evenFieldX['field'].clarray,
-            self.field.evenFieldY['field'].clarray) = \
+        (self.field.evenFieldX['field'],
+            self.field.evenFieldY['field']) = \
                 self.material[material2].apply(queue,
                     (self.field.evenFieldX['flux'],
                         self.field.evenFieldY['flux']),

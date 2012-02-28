@@ -128,18 +128,18 @@ class Material:
         # get flux
         fluxX, fluxY = flux
 
-        fieldX = clarray.to_device(queue, numpy.zeros(fluxX.narray.shape))
-        fieldY = clarray.to_device(queue, numpy.zeros(fluxX.narray.shape))
+        fieldX = clarray.to_device(queue, numpy.zeros(fluxX.shape))
+        fieldY = clarray.to_device(queue, numpy.zeros(fluxX.shape))
 
         # apply all layer
         for layer in self.layer:
             funcX, funcY, dictX, dictY, mask = layer
 
             # calc field
-            fieldX = mask * funcX(fluxX.clarray, deltaT, t, dictX) \
+            fieldX = mask * funcX(fluxX, deltaT, t, dictX) \
                 + (1.0 - mask) * fieldX
 
-            fieldY = mask * funcY(fluxY.clarray, deltaT, t, dictY) \
+            fieldY = mask * funcY(fluxY, deltaT, t, dictY) \
                 + (1.0 - mask) * fieldY
 
         return fieldX, fieldY

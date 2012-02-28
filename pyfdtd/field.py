@@ -20,21 +20,12 @@ import numpy
 import pyopencl.array as clarray
 
 
-class Buffer:
-    def __init__(self, queue, shape):
-        # create numpy array
-        self.narray = numpy.zeros(shape)
+def buffer_creator(queue, shape):
+    # create numpy array
+    narray = numpy.zeros(shape)
 
-        # create cl array
-        self.clarray = clarray.to_device(queue, self.narray)
-
-    def to_cl(self, queue):
-        # copy numpy to cl
-        self.clarray = clarray.to_device(queue, self.narray)
-
-    def to_numpy(self, queue):
-        # copy cl to numpy
-        self.narray = self.clarray.get()
+    # copy to device
+    return clarray.to_device(queue, narray)
 
 
 class Field:
@@ -58,17 +49,17 @@ class Field:
 
         # create even and odd Field
         self.evenFieldX = {
-                'field': Buffer(queue, (sizeX / deltaX, sizeY / deltaY)),
-                'flux': Buffer(queue, (sizeX / deltaX, sizeY / deltaY))}
+                'field': buffer_creator(queue, (sizeX / deltaX, sizeY / deltaY)),
+                'flux': buffer_creator(queue, (sizeX / deltaX, sizeY / deltaY))}
         self.evenFieldY = {
-                'field': Buffer(queue, (sizeX / deltaX, sizeY / deltaY)),
-                'flux': Buffer(queue, (sizeX / deltaX, sizeY / deltaY))}
+                'field': buffer_creator(queue, (sizeX / deltaX, sizeY / deltaY)),
+                'flux': buffer_creator(queue, (sizeX / deltaX, sizeY / deltaY))}
         self.oddFieldX = {
-                'field': Buffer(queue, (sizeX / deltaX, sizeY / deltaY)),
-                'flux': Buffer(queue, (sizeX / deltaX, sizeY / deltaY))}
+                'field': buffer_creator(queue, (sizeX / deltaX, sizeY / deltaY)),
+                'flux': buffer_creator(queue, (sizeX / deltaX, sizeY / deltaY))}
         self.oddFieldY = {
-                'field': Buffer(queue, (sizeX / deltaX, sizeY / deltaY)),
-                'flux': Buffer(queue, (sizeX / deltaX, sizeY / deltaY))}
+                'field': buffer_creator(queue, (sizeX / deltaX, sizeY / deltaY)),
+                'flux': buffer_creator(queue, (sizeX / deltaX, sizeY / deltaY))}
 
         # save all given information
         self.size = size
@@ -84,7 +75,7 @@ class Field:
         x, y = int(x / deltaX), int(y / deltaY)
 
         # return field vector
-        return (self.evenFieldX['field'].narray[x, y],
-                self.evenFieldY['field'].narray[x, y],
-                self.oddFieldX['field'].narray[x, y] + \
-                self.oddFieldY['field'].narray[x, y])
+        return (self.evenFieldX['field'].get()[x, y],
+                self.evenFieldY['field'].get()[x, y],
+                (self.oddFieldX['field'] + \
+                self.oddFieldY['field']).get()[x, y])

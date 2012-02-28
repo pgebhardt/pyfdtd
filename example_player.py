@@ -30,13 +30,13 @@ def main():
     history = []
 
     def progress(t, deltaT, field):
-        xShape, yShape = field.oddFieldX['flux'].narray.shape
+        xShape, yShape = field.oddFieldX['flux'].shape
         interval = xShape * yShape * 5e-9 / (256e6 / 4.0)
 
         # save history
         if t / deltaT % (interval / deltaT) < 1.0:
-            history.append((field.oddFieldX['field'].clarray + \
-                    field.oddFieldY['field'].clarray).get())
+            history.append((field.oddFieldX['field'] + \
+                    field.oddFieldY['field']).get())
 
         # print progess
         if t / deltaT % 100 < 1.0:
