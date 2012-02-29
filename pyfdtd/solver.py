@@ -41,7 +41,7 @@ class Solver:
         self.sourceY = clarray.to_device(self.queue,
             numpy.zeros(self.field.oddFieldY['flux'].shape))
 
-        # create listeners
+        # create listener
         self.listener = []
 
         # create materials
@@ -86,11 +86,12 @@ class Solver:
             # close file
             f.close()
 
-    def solve(self, queue, duration, starttime=0.0, deltaT=0.0,
+    def solve(self, duration, starttime=0.0, deltaT=0.0,
             progressfunction=None, finishfunction=None):
         """Iterates the FDTD algorithm in respect of the pre-defined ports"""
         # get parameter
         deltaX, deltaY = self.field.delta
+        shapeX, shapeY = self.field.oddFieldX['flux'].shape
 
         # calc deltaT
         if deltaT == 0.0:
@@ -100,6 +101,11 @@ class Solver:
         # create constants
         kx = deltaT / deltaX
         ky = deltaT / deltaY
+
+        # create listener memory
+        for listener in self.listener:
+            listener.clvalues = clarray.to_device(self.queue,
+                numpy.zeros((duration / deltaT + 1, 3)))
 
         # material aliases
         material1 = 'electric'
@@ -113,21 +119,38 @@ class Solver:
         # iterate
         for t in numpy.arange(starttime, starttime + duration, deltaT):
             # do step
-            self._step(queue, deltaT, t, kx, ky, material1, material2)
+            self._step(deltaT, t, kx, ky, material1, material2)
 
             # call all listeners
+            step = numpy.int32((t - starttime) / deltaT)
+            #print step
+
             for listener in self.listener:
-                listener.update(self.field)
+                posX, posY = listener.pos
+                self.program.listener(self.queue, (1, ), None,
+                listener.clvalues.data,
+                self.field.evenFieldX['field'].data,
+                self.field.evenFieldX['field'].data,
+                self.field.oddFieldX['field'].data,
+                self.field.oddFieldY['field'].data,
+                numpy.int32(int(posX * shapeY / deltaX) + int(posY / deltaY)),
+                numpy.int32(step))
 
             # call progress function
             if progressfunction:
                 progressfunction(t, deltaT, self.field)
 
+        self.queue.finish()
+
+        # copy all listener to host
+        for listener in self.listener:
+            listener.copy_to_host()
+
         # call finish function
         if finishfunction:
             finishfunction()
 
-    def _step(self, queue, deltaT, t, kx, ky, material1, material2):
+    def _step(self, deltaT, t, kx, ky, material1, material2):
         shapeX, shapeY = self.field.oddFieldX['flux'].shape
         eventX = self.program.oddFieldX(self.queue, (shapeX - 1, shapeY - 1),
                 None, self.field.oddFieldX['flux'].data,
@@ -137,11 +160,11 @@ class Solver:
                 None, self.field.oddFieldY['flux'].data,
                 self.field.evenFieldY['field'].data, numpy.float64(kx))
 
-        #eventX.wait()
-        #eventY.wait()
+        eventX.wait()
+        eventY.wait()
 
         # apply sources
-        self.source.apply(queue,
+        self.source.apply(self.queue,
             (self.field.oddFieldX['flux'], self.field.oddFieldY['flux']),
             (self.sourceX, self.sourceY), deltaT, t)
 
@@ -149,7 +172,7 @@ class Solver:
         self.field.oddFieldY['flux'] += self.sourceY
 
         # apply material
-        self.material[material1].apply(queue,
+        self.material[material1].apply(self.queue,
             (self.field.oddFieldX['flux'], self.field.oddFieldY['flux']),
             (self.field.oddFieldX['field'], self.field.oddFieldY['field']),
             deltaT, t)
@@ -164,11 +187,11 @@ class Solver:
                 self.field.oddFieldX['field'].data,
                 self.field.oddFieldY['field'].data, numpy.float64(kx))
 
-        #eventX.wait()
-        #eventY.wait()
+        eventX.wait()
+        eventY.wait()
 
         # apply material
-        self.material[material2].apply(queue,
+        self.material[material2].apply(self.queue,
             (self.field.evenFieldX['flux'], self.field.evenFieldY['flux']),
             (self.field.evenFieldX['field'], self.field.evenFieldY['field']),
             deltaT, t)

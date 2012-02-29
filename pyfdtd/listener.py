@@ -14,6 +14,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from numpy import array
 
 
 class Listener:
@@ -21,15 +22,19 @@ class Listener:
         # save attribute
         self.pos = posX, posY
 
-        # create value storage
-        self.X, self.Y, self.Z = [], [], []
+        # create value
+        self.X, self.Y, self.Z = array((1, )), array((1, )), array((1, ))
         self.values = self.X, self.Y, self.Z
+        self.clvalues = 0.0
 
-    def update(self, field):
-        # get value
-        x, y, z = field[self.pos]
+    def copy_to_host(self):
+        # get array
+        values = self.clvalues.get()
 
-        # save value
-        self.X.append(x)
-        self.Y.append(y)
-        self.Z.append(z)
+        # split buffer
+        self.X = values[:, 0]
+        self.Y = values[:, 1]
+        self.Z = values[:, 2]
+
+        # set values
+        self.values = self.X, self.Y, self.Z

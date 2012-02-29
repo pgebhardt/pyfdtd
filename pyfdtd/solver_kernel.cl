@@ -15,8 +15,6 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-#pragma OPENCL EXTENSION cl_hkr_fp64: enable
-
 __kernel void oddFieldX(__global double* oddFieldX, __global const double* evenFieldX, double ky)
 {
     int x = get_global_id(0);
@@ -55,4 +53,13 @@ __kernel void evenFieldY(__global double* evenFieldY, __global const double* odd
 
     evenFieldY[x*y_size + y] += kx * (oddFieldX[x*y_size + y] + oddFieldY[x*y_size + y] -
                         oddFieldX[(x-1)*y_size + y] - oddFieldY[(x-1)*y_size + y]);
+}
+
+__kernel void listener(__global double* values, __global const double* fieldX,
+                                __global const double* fieldY, __global const double* fieldZX,
+                                __global const double* fieldZY, int pos, int step)
+{
+    values[step*3 + 0] = fieldX[pos];
+    values[step*3 + 1] = fieldY[pos];
+    values[step*3 + 2] = fieldZX[pos] + fieldZY[pos];
 }
