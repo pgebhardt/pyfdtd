@@ -19,6 +19,7 @@
 import math
 import numpy
 import pyopencl as cl
+import pyopencl.array as clarray
 from scipy import constants
 from material import Material
 from pml import pml
@@ -35,6 +36,10 @@ class Solver:
 
         # create sources
         self.source = Material(self.ctx, self.queue, field.size, field.delta)
+        self.sourceX = clarray.to_device(self.queue,
+            numpy.zeros(self.field.oddFieldX['flux'].shape))
+        self.sourceY = clarray.to_device(self.queue,
+            numpy.zeros(self.field.oddFieldY['flux'].shape))
 
         # create listeners
         self.listener = []
@@ -132,24 +137,22 @@ class Solver:
                 None, self.field.oddFieldY['flux'].data,
                 self.field.evenFieldY['field'].data, numpy.float64(kx))
 
-        eventX.wait()
-        eventY.wait()
+        #eventX.wait()
+        #eventY.wait()
 
         # apply sources
-        sourceX, sourceY = self.source.apply(queue,
-                (self.field.oddFieldX['flux'], self.field.oddFieldY['flux']),
-                deltaT, t)
+        self.source.apply(queue,
+            (self.field.oddFieldX['flux'], self.field.oddFieldY['flux']),
+            (self.sourceX, self.sourceY), deltaT, t)
 
-        self.field.oddFieldX['flux'] += sourceX
-        self.field.oddFieldY['flux'] += sourceY
+        self.field.oddFieldX['flux'] += self.sourceX
+        self.field.oddFieldY['flux'] += self.sourceY
 
         # apply material
-        (self.field.oddFieldX['field'],
-            self.field.oddFieldY['field']) = \
-                self.material[material1].apply(queue,
-                    (self.field.oddFieldX['flux'],
-                        self.field.oddFieldY['flux']),
-                        deltaT, t)
+        self.material[material1].apply(queue,
+            (self.field.oddFieldX['flux'], self.field.oddFieldY['flux']),
+            (self.field.oddFieldX['field'], self.field.oddFieldY['field']),
+            deltaT, t)
 
         eventX = self.program.evenFieldX(self.queue, (shapeX - 1, shapeY - 2),
                 None, self.field.evenFieldX['flux'].data,
@@ -161,13 +164,11 @@ class Solver:
                 self.field.oddFieldX['field'].data,
                 self.field.oddFieldY['field'].data, numpy.float64(kx))
 
-        eventX.wait()
-        eventY.wait()
+        #eventX.wait()
+        #eventY.wait()
 
         # apply material
-        (self.field.evenFieldX['field'],
-            self.field.evenFieldY['field']) = \
-                self.material[material2].apply(queue,
-                    (self.field.evenFieldX['flux'],
-                        self.field.evenFieldY['flux']),
-                        deltaT, t)
+        self.material[material2].apply(queue,
+            (self.field.evenFieldX['flux'], self.field.evenFieldY['flux']),
+            (self.field.evenFieldX['field'], self.field.evenFieldY['field']),
+            deltaT, t)

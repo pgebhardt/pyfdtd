@@ -26,11 +26,5 @@
         ], 
         "magnetic": []
     }, 
-    "source": [
-        [
-            "source", 
-            "(x-0.1)**2 + (y-0.1)**2 < 0.001**2", 
-            "pulse(amplitude=1.0e3, width=200e-12, freq=20e9, offset=1e-9)"
-        ]
-    ]
+    "source": []
 }

@@ -74,10 +74,18 @@ def pml(queue, size, delta, thickness=20.0, mode='TMz'):
 
     # create layer
     electric = (
-        Material.epsilon(1.0, clarray.to_device(queue, sigma['electricX'])),
-        Material.epsilon(1.0, clarray.to_device(queue, sigma['electricY'])))
+        Material.epsilon(clarray.to_device(queue,
+            numpy.ones((shapeX, shapeY))),
+            clarray.to_device(queue, sigma['electricX'])),
+        Material.epsilon(clarray.to_device(queue,
+            numpy.ones((shapeX, shapeY))),
+            clarray.to_device(queue, sigma['electricY'])))
     magnetic = (
-        Material.mu(1.0, clarray.to_device(queue, sigma['magneticX'])),
-        Material.mu(1.0, clarray.to_device(queue, sigma['magneticY'])))
+        Material.mu(clarray.to_device(queue,
+            numpy.ones((shapeX, shapeY))),
+            clarray.to_device(queue, sigma['magneticX'])),
+        Material.mu(clarray.to_device(queue,
+            numpy.ones((shapeX, shapeY))),
+            clarray.to_device(queue, sigma['magneticY'])))
 
     return electric, magnetic, mask

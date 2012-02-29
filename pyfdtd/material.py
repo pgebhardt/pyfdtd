@@ -57,6 +57,12 @@ class Material:
         # create programs
         self.create_programs()
 
+        # create temp buffer
+        self.tempX = clarray.to_device(self.queue,
+            numpy.zeros((sizeX / deltaX, sizeY / deltaY)))
+        self.tempY = clarray.to_device(self.queue,
+            numpy.zeros((sizeX / deltaX, sizeY / deltaY)))
+
     def create_programs(self):
         # open file
         f = open('./pyfdtd/material_kernel.cl', 'r')
@@ -139,7 +145,7 @@ class Material:
             numpy.zeros(shape)))
         self.layer.append((funcX, funcY, dictX, dictY, mask))
 
-    def apply(self, queue, flux, deltaT, t):
+    def apply(self, queue, flux, field, deltaT, t):
         """
         Calculates the field from the flux density
 
@@ -154,22 +160,28 @@ class Material:
         # get flux
         fluxX, fluxY = flux
 
-        fieldX = clarray.to_device(queue, numpy.zeros(fluxX.shape))
-        fieldY = clarray.to_device(queue, numpy.zeros(fluxX.shape))
+        # get field
+        fieldX, fieldY = field
+
+        # zero fields
+        self.program.zero(self.queue, fieldX.shape, None, fieldX.data)
+        self.program.zero(self.queue, fieldY.shape, None, fieldY.data)
 
         # apply all layer
         for layer in self.layer:
             funcX, funcY, dictX, dictY, mask = layer
 
+            # calc functions
+            funcX(self.queue, self.program, fluxX, self.tempX,
+                deltaT, t, dictX)
+            funcY(self.queue, self.program, fluxY, self.tempY,
+                deltaT, t, dictY)
+
             self.program.apply(self.queue, fieldX.shape, None,
-                    fieldX.data, funcX(fluxX, deltaT, t, dictX).data,
-                    mask.data)
+                    fieldX.data, self.tempX.data, mask.data)
 
             self.program.apply(self.queue, fieldY.shape, None,
-                    fieldY.data, funcX(fluxY, deltaT, t, dictY).data,
-                    mask.data)
-
-        return fieldX, fieldY
+                    fieldY.data, self.tempY.data, mask.data)
 
     @staticmethod
     def epsilon(er=1.0, sigma=0.0):
@@ -185,13 +197,22 @@ class Material:
         sigma
             Conductivity
         """
-        # create epsilon function
-        def res(flux, dt, t, mem):
-            field = flux / constants.epsilon_0
-            field = (1.0 / (constants.epsilon_0 * er + sigma * dt)) \
-                    * (flux - mem['int'])
-            mem['int'] += sigma * field * dt
-            return field
+        # check types
+        if isinstance(er, float) and isinstance(sigma, float):
+            # create epsilon function
+            def res(queue, program, flux, field, dt, t, mem):
+                program.epsilon(queue, flux.shape, None,
+                    field.data, flux.data, mem['int'].data, numpy.float64(er),
+                    numpy.float64(sigma), numpy.float64(dt), numpy.float64(t),
+                    numpy.float64(constants.epsilon_0))
+
+        else:
+            # create epsilon function
+            def res(queue, program, flux, field, dt, t, mem):
+                program.epsilon_with_arrays(queue, flux.shape, None,
+                    field.data, flux.data, mem['int'].data, er.data,
+                    sigma.data, numpy.float64(dt), numpy.float64(t),
+                    numpy.float64(constants.epsilon_0))
 
         # return function
         return res
@@ -207,13 +228,22 @@ class Material:
         mur
             Relative permeability
         """
-        # create mu function
-        def res(flux, dt, t, mem):
-            field = flux / constants.mu_0
-            field = (1.0 / (constants.mu_0 * mur + sigma * dt)) \
-                    * (flux - mem['int'])
-            mem['int'] += sigma * field * dt
-            return field
+        # check types
+        if isinstance(mur, float) and isinstance(sigma, float):
+            # create epsilon function
+            def res(queue, program, flux, field, dt, t, mem):
+                program.mu(queue, flux.shape, None,
+                    field.data, flux.data, mem['int'].data, numpy.float64(mur),
+                    numpy.float64(sigma), numpy.float64(dt), numpy.float64(t),
+                    numpy.float64(constants.mu_0))
+
+        else:
+            # create epsilon function
+            def res(queue, program, flux, field, dt, t, mem):
+                program.mu_with_arrays(queue, flux.shape, None,
+                    field.data, flux.data, mem['int'].data, mur.data,
+                    sigma.data, numpy.float64(dt), numpy.float64(t),
+                    numpy.float64(constants.mu_0))
 
         # return function
         return res

@@ -15,7 +15,7 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-__kernel void apply(__global double* field, __global double* func, __global double* mask)
+__kernel void apply(__global double* field, __global const double* func, __global const double* mask)
 {
     int x = get_global_id(0);
     int y = get_global_id(1);
@@ -23,4 +23,65 @@ __kernel void apply(__global double* field, __global double* func, __global doub
 
     field[x*y_size + y] =   mask[x*y_size + y] * func[x*y_size + y] +
                             (1.0 - mask[x*y_size + y]) * field[x*y_size + y];
+}
+
+__kernel void zero(__global double* input)
+{
+    int x = get_global_id(0);
+    int y = get_global_id(1);
+    int y_size = get_global_size(1);
+
+    input[x*y_size + y] = 0.0;
+}
+
+__kernel void epsilon(__global double* field, __global const double* flux,
+                        __global double* integrate, double er,
+                        double sigma, double dt, double t, double e_0)
+{
+    int x = get_global_id(0);
+    int y = get_global_id(1);
+    int y_size = get_global_size(1);
+
+    field[x*y_size + y] = (1.0 / (e_0 * er + sigma * dt)) *
+                            (flux[x*y_size + y] - integrate[x*y_size + y]);
+    integrate[x*y_size + y] += sigma * field[x*y_size + y] * dt;
+}
+
+__kernel void epsilon_with_arrays(__global double* field, __global const double* flux,
+                        __global double* integrate, __global const double* er,
+                        __global const double* sigma, double dt, double t, double e_0)
+{
+    int x = get_global_id(0);
+    int y = get_global_id(1);
+    int y_size = get_global_size(1);
+
+    field[x*y_size + y] = (1.0 / (e_0 * er[x*y_size + y] + sigma[x*y_size + y] * dt)) *
+                            (flux[x*y_size + y] - integrate[x*y_size + y]);
+    integrate[x*y_size + y] += sigma[x*y_size + y] * field[x*y_size + y] * dt;
+}
+
+__kernel void mu(__global double* field, __global const double* flux,
+                        __global double* integrate, double mur,
+                        double sigma, double dt, double t, double mu_0)
+{
+    int x = get_global_id(0);
+    int y = get_global_id(1);
+    int y_size = get_global_size(1);
+
+    field[x*y_size + y] = (1.0 / (mu_0 * mur + sigma * dt)) *
+                            (flux[x*y_size + y] - integrate[x*y_size + y]);
+    integrate[x*y_size + y] += sigma * field[x*y_size + y] * dt;
+}
+
+__kernel void mu_with_arrays(__global double* field, __global const double* flux,
+                        __global double* integrate, __global const double* mur,
+                        __global const double* sigma, double dt, double t, double mu_0)
+{
+    int x = get_global_id(0);
+    int y = get_global_id(1);
+    int y_size = get_global_size(1);
+
+    field[x*y_size + y] = (1.0 / (mu_0 * mur[x*y_size + y] + sigma[x*y_size + y] * dt)) *
+                            (flux[x*y_size + y] - integrate[x*y_size + y]);
+    integrate[x*y_size + y] += sigma[x*y_size + y] * field[x*y_size + y] * dt;
 }

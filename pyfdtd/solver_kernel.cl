@@ -17,7 +17,7 @@
 
 #pragma OPENCL EXTENSION cl_hkr_fp64: enable
 
-__kernel void oddFieldX(__global double* oddFieldX, __global double* evenFieldX, double ky)
+__kernel void oddFieldX(__global double* oddFieldX, __global const double* evenFieldX, double ky)
 {
     int x = get_global_id(0);
     int y = get_global_id(1);
@@ -26,7 +26,7 @@ __kernel void oddFieldX(__global double* oddFieldX, __global double* evenFieldX,
     oddFieldX[x*y_size + y] -= ky * (evenFieldX[x*y_size + y+1] - evenFieldX[x*y_size + y]);
 }
 
-__kernel void oddFieldY(__global double* oddFieldY, __global double* evenFieldY, double kx)
+__kernel void oddFieldY(__global double* oddFieldY, __global const double* evenFieldY, double kx)
 {
     int x = get_global_id(0);
     int y = get_global_id(1);
@@ -35,8 +35,8 @@ __kernel void oddFieldY(__global double* oddFieldY, __global double* evenFieldY,
     oddFieldY[x*y_size + y] += kx * (evenFieldY[(x+1)*y_size + y] - evenFieldY[x*y_size + y]);
 }
 
-__kernel void evenFieldX(__global double* evenFieldX, __global double* oddFieldX,
-                                  __global double* oddFieldY, double ky)
+__kernel void evenFieldX(__global double* evenFieldX, __global const double* oddFieldX,
+                                  __global const double* oddFieldY, double ky)
 {
     int x = get_global_id(0);
     int y = get_global_id(1) + 1;
@@ -46,8 +46,8 @@ __kernel void evenFieldX(__global double* evenFieldX, __global double* oddFieldX
                         oddFieldX[x*y_size + y-1] - oddFieldY[x*y_size + y-1]);
 }
 
-__kernel void evenFieldY(__global double* evenFieldY, __global double* oddFieldX,
-                                  __global double* oddFieldY, double kx)
+__kernel void evenFieldY(__global double* evenFieldY, __global const double* oddFieldX,
+                                  __global const double* oddFieldY, double kx)
 {
     int x = get_global_id(0) + 1;
     int y = get_global_id(1);
