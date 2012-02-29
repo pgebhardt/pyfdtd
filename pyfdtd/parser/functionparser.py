@@ -44,7 +44,8 @@ def source_from_string(expression, functions={}):
 
     # if not a source function, create one
     def res(queue, program, flux, field, deltaT, t, mem):
-        field = 0.0 * flux + -0.5 * deltaT * eval(expression)
+        program.set(queue, field.shape, None, field.data,
+            (0.0 * flux + -0.5 * deltaT * eval(expression)).data)
 
     return res
 
@@ -57,8 +58,4 @@ def material_from_string(expression, functions={}):
     if isinstance(function, FunctionType):
         return function
 
-    # if not a material function, create one
-    def res(flux, deltaT, t, mem):
-        return eval(expression)
-
-    return res
+    raise ValueError('In CL version are only known material functions allowed')

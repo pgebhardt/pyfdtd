@@ -43,39 +43,32 @@ class Field:
 
     """
     def __init__(self, queue, size, delta):
+        # save all given information
+        self.size = size
+        self.delta = delta
+
         # get values
         sizeX, sizeY = size
         deltaX, deltaY = delta
 
         # create even and odd Field
         self.evenFieldX = {
-                'field': buffer_creator(queue, (sizeX / deltaX, sizeY / deltaY)),
-                'flux': buffer_creator(queue, (sizeX / deltaX, sizeY / deltaY))}
+                'field': buffer_creator(queue,
+                    (sizeX / deltaX, sizeY / deltaY)),
+                'flux': buffer_creator(queue,
+                    (sizeX / deltaX, sizeY / deltaY))}
         self.evenFieldY = {
-                'field': buffer_creator(queue, (sizeX / deltaX, sizeY / deltaY)),
-                'flux': buffer_creator(queue, (sizeX / deltaX, sizeY / deltaY))}
+                'field': buffer_creator(queue,
+                    (sizeX / deltaX, sizeY / deltaY)),
+                'flux': buffer_creator(queue,
+                    (sizeX / deltaX, sizeY / deltaY))}
         self.oddFieldX = {
-                'field': buffer_creator(queue, (sizeX / deltaX, sizeY / deltaY)),
-                'flux': buffer_creator(queue, (sizeX / deltaX, sizeY / deltaY))}
+                'field': buffer_creator(queue,
+                    (sizeX / deltaX, sizeY / deltaY)),
+                'flux': buffer_creator(queue,
+                    (sizeX / deltaX, sizeY / deltaY))}
         self.oddFieldY = {
-                'field': buffer_creator(queue, (sizeX / deltaX, sizeY / deltaY)),
-                'flux': buffer_creator(queue, (sizeX / deltaX, sizeY / deltaY))}
-
-        # save all given information
-        self.size = size
-        self.delta = delta
-
-    def __getitem__(self, key):
-        """Returns the field vector at the given location"""
-        # obtain parameter
-        x, y = key
-        deltaX, deltaY = self.delta
-
-        # scale x, y
-        x, y = int(x / deltaX), int(y / deltaY)
-
-        # return field vector
-        return (self.evenFieldX['field'].get()[x, y],
-                self.evenFieldY['field'].get()[x, y],
-                (self.oddFieldX['field'] + \
-                self.oddFieldY['field']).get()[x, y])
+                'field': buffer_creator(queue,
+                    (sizeX / deltaX, sizeY / deltaY)),
+                'flux': buffer_creator(queue,
+                    (sizeX / deltaX, sizeY / deltaY))}
