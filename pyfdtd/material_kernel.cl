@@ -34,6 +34,15 @@ __kernel void zero(__global double* input)
     input[x*y_size + y] = 0.0;
 }
 
+__kernel void set(__global double* dest, __global const double* src)
+{
+    int x = get_global_id(0);
+    int y = get_global_id(1);
+    int y_size = get_global_size(1);
+
+    dest[x*y_size + y] = src[x*y_size + y];
+}
+
 __kernel void epsilon(__global double* field, __global const double* flux,
                         __global double* integrate, double er,
                         double sigma, double dt, double t, double e_0)
