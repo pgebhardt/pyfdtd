@@ -16,6 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import os
+import inspect
 import math
 import numpy
 import pyopencl as cl
@@ -66,7 +68,8 @@ class Solver:
 
     def create_programs(self):
         # open file
-        f = open('./pyfdtd/solver_kernel.cl', 'r')
+        pathName = os.path.dirname(inspect.getfile(inspect.currentframe()))
+        f = open(pathName + '/solver_kernel.cl', 'r')
 
         # read string
         programmString = f.read()

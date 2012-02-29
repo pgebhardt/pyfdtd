@@ -16,6 +16,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+import os
+import inspect
 from types import FunctionType
 from collections import defaultdict
 from scipy import constants
@@ -65,7 +67,8 @@ class Material:
 
     def create_programs(self):
         # open file
-        f = open('./pyfdtd/material_kernel.cl', 'r')
+        pathName = os.path.dirname(inspect.getfile(inspect.currentframe()))
+        f = open(pathName + '/material_kernel.cl', 'r')
 
         # read string
         programmString = f.read()
