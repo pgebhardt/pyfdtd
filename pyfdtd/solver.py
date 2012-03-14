@@ -126,24 +126,28 @@ class Solver:
 
             # call all listeners
             step = numpy.int32((t - starttime) / deltaT)
-            #print step
 
             for listener in self.listener:
+                # finish queue
+                self.queue.finish()
+
+                # get listener position
                 posX, posY = listener.pos
+
+                # save field at listener position
                 self.program.listener(self.queue, (1, ), None,
-                listener.clvalues.data,
-                self.field.evenFieldX['field'].data,
-                self.field.evenFieldX['field'].data,
-                self.field.oddFieldX['field'].data,
-                self.field.oddFieldY['field'].data,
-                numpy.int32(int(posX * shapeY / deltaX) + int(posY / deltaY)),
-                numpy.int32(step))
+                    listener.clvalues.data,
+                    self.field.evenFieldX['field'].data,
+                    self.field.evenFieldX['field'].data,
+                    self.field.oddFieldX['field'].data,
+                    self.field.oddFieldY['field'].data,
+                    numpy.int32(int(posX * shapeY / deltaX) + \
+                        int(posY / deltaY)),
+                    numpy.int32(step))
 
             # call progress function
             if progressfunction:
                 progressfunction(t, deltaT, self.field)
-
-        self.queue.finish()
 
         # copy all listener to host
         for listener in self.listener:

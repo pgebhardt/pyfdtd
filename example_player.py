@@ -26,22 +26,6 @@ import pyfdtd
 
 
 def main():
-    # progress function
-    history = []
-
-    def progress(t, deltaT, field):
-        xShape, yShape = field.oddFieldX['flux'].shape
-        interval = xShape * yShape * 5e-9 / (256e6 / 4.0)
-
-        # save history
-        if t / deltaT % (interval / deltaT) < 1.0:
-            history.append((field.oddFieldX['field'] + \
-                    field.oddFieldY['field']).get())
-
-        # print progess
-        if t / deltaT % 100 < 1.0:
-            print '{}'.format(t * 100.0 / 5e-9)
-
     # create context
     ctx = cl.create_some_context()
 
@@ -52,8 +36,24 @@ def main():
     job = pyfdtd.Job().load(sys.argv[1])
     solver = job.get_solver(ctx, queue)
 
+    # progress function
+    history = []
+    xShape, yShape = solver.field.oddFieldX['flux'].shape
+    interval = xShape * yShape * job.config['duration'] / \
+        (256e6 / 4.0)
+
+    def progress(t, deltaT, field):
+        # save history
+        if t / deltaT % (interval / deltaT) < 1.0:
+            history.append((field.oddFieldX['field'] + \
+                    field.oddFieldY['field']).get())
+
+        # print progess
+        if t / deltaT % 100 < 1.0:
+            print '{}'.format(t * 100.0 / job.config['duration'])
+
     # iterate
-    solver.solve(queue, job.config['duration'], progressfunction=progress)
+    solver.solve(job.config['duration'], progressfunction=progress)
 
     # show plot
     fig = plt.figure(1)

@@ -4,13 +4,19 @@
             0.001, 
             0.001
         ], 
-        "duration": 5e-09, 
+        "duration": 40e-09, 
         "size": [
             0.2, 
             0.4
         ]
     },
-    "listener": [],
+    "listener": [
+        [
+            "receiver", 
+            0.1, 
+            0.1
+        ]
+    ],
     "material": {
         "electric": [
             [
@@ -26,5 +32,11 @@
         ], 
         "magnetic": []
     }, 
-    "source": []
+    "source": [
+        [
+            "source", 
+            "(x-0.1)**2 + (y-0.1)**2 < 0.001**2", 
+            "pulse(amplitude=1.0e3, width=200e-12, freq=20e9, offset=1e-9)"
+        ]
+    ]
 }
