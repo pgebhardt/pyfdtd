@@ -120,12 +120,15 @@ class Solver:
             material1, material2 = material2, material1
 
         # iterate
-        for t in numpy.arange(starttime, starttime + duration, deltaT):
+        timerange = map(None, numpy.arange(starttime, starttime + duration,
+            deltaT))
+
+        for t in timerange:
             # do step
             self._step(deltaT, t, kx, ky, material1, material2)
 
             # call all listeners
-            step = numpy.int32((t - starttime) / deltaT)
+            step = numpy.int32(timerange.index(t))
 
             for listener in self.listener:
                 # finish queue
@@ -143,7 +146,7 @@ class Solver:
                     self.field.oddFieldY['field'].data,
                     numpy.int32(int(posX * shapeY / deltaX) + \
                         int(posY / deltaY)),
-                    numpy.int32(step))
+                    step)
 
             # call progress function
             if progressfunction:
