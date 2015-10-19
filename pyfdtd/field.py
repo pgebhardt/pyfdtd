@@ -39,18 +39,19 @@ class Field:
         deltaX, deltaY = delta
 
         # create even and odd Field
+        shape = (int(sizeX / deltaX), int(sizeY / deltaY))
         self.evenFieldX = {
-                'field': numpy.zeros((sizeX / deltaX, sizeY / deltaY)),
-                'flux': numpy.zeros((sizeX / deltaX, sizeY / deltaY))}
+                'field': numpy.zeros(shape),
+                'flux': numpy.zeros(shape)}
         self.evenFieldY = {
-                'field': numpy.zeros((sizeX / deltaX, sizeY / deltaY)),
-                'flux': numpy.zeros((sizeX / deltaX, sizeY / deltaY))}
+                'field': numpy.zeros(shape),
+                'flux': numpy.zeros(shape)}
         self.oddFieldX = {
-                'field': numpy.zeros((sizeX / deltaX, sizeY / deltaY)),
-                'flux': numpy.zeros((sizeX / deltaX, sizeY / deltaY))}
+                'field': numpy.zeros(shape),
+                'flux': numpy.zeros(shape)}
         self.oddFieldY = {
-                'field': numpy.zeros((sizeX / deltaX, sizeY / deltaY)),
-                'flux': numpy.zeros((sizeX / deltaX, sizeY / deltaY))}
+                'field': numpy.zeros(shape),
+                'flux': numpy.zeros(shape)}
 
         # save all given information
         self.size = size

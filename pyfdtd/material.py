@@ -69,7 +69,7 @@ class Material:
         deltaX, deltaY = self.delta
 
         # create mask
-        shape = (sizeX / deltaX, sizeY / deltaY)
+        shape = (int(sizeX / deltaX), int(sizeY / deltaY))
         mask = numpy.zeros(shape)
 
         # check if key is a numpy array

@@ -29,7 +29,7 @@ def pml(size, delta, thickness=20.0, mode='TMz'):
     deltaX, deltaY = delta
 
     # crate material
-    shapeX, shapeY = sizeX / deltaX, sizeY / deltaY
+    shapeX, shapeY = int(sizeX / deltaX), int(sizeY / deltaY)
     sigma = {
             'electricX': numpy.zeros((shapeX, shapeY)),
             'electricY': numpy.zeros((shapeX, shapeY)),

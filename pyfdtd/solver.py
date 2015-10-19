@@ -94,11 +94,11 @@ class Solver:
     def _step(self, deltaT, t, kx, ky, material1, material2):
         # calc oddField
         self.field.oddFieldY['flux'][:-1, :-1] += kx * \
-                (self.field.evenFieldY['field'][1:, :-1] - \
-                self.field.evenFieldY['field'][:-1, :-1])
+            (self.field.evenFieldY['field'][1:, :-1] - \
+            self.field.evenFieldY['field'][:-1, :-1])
         self.field.oddFieldX['flux'][:-1, :-1] -= ky * \
-                (self.field.evenFieldX['field'][:-1, 1:] - \
-                self.field.evenFieldX['field'][:-1, :-1])
+            (self.field.evenFieldX['field'][:-1, 1:] - \
+            self.field.evenFieldX['field'][:-1, :-1])
 
         # apply sources
         sourceX, sourceY = self.source.apply((self.field.oddFieldX['flux'],
@@ -108,24 +108,22 @@ class Solver:
 
         # apply material
         self.field.oddFieldX['field'], self.field.oddFieldY['field'] = \
-                self.material[material1].apply(
-                        (self.field.oddFieldX['flux'],
-                            self.field.oddFieldY['flux']), deltaT, t)
+            self.material[material1].apply((self.field.oddFieldX['flux'],
+                self.field.oddFieldY['flux']), deltaT, t)
 
         # calc evenField
         self.field.evenFieldX['flux'][:-1, 1:-1] -= ky * \
-                (self.field.oddFieldX['field'][:-1, 1:-1] + \
-                self.field.oddFieldY['field'][:-1, 1:-1] - \
-                self.field.oddFieldX['field'][:-1, :-2] - \
-                self.field.oddFieldY['field'][:-1, :-2])
+            (self.field.oddFieldX['field'][:-1, 1:-1] + \
+            self.field.oddFieldY['field'][:-1, 1:-1] - \
+            self.field.oddFieldX['field'][:-1, :-2] - \
+            self.field.oddFieldY['field'][:-1, :-2])
         self.field.evenFieldY['flux'][1:-1, :-1] += kx * \
-                (self.field.oddFieldX['field'][1:-1, :-1] + \
-                self.field.oddFieldY['field'][1:-1, :-1] - \
-                self.field.oddFieldX['field'][:-2, :-1] - \
-                self.field.oddFieldY['field'][:-2, :-1])
+            (self.field.oddFieldX['field'][1:-1, :-1] + \
+            self.field.oddFieldY['field'][1:-1, :-1] - \
+            self.field.oddFieldX['field'][:-2, :-1] - \
+            self.field.oddFieldY['field'][:-2, :-1])
 
         # apply material
         self.field.evenFieldX['field'], self.field.evenFieldY['field'] = \
-                self.material[material2].apply(
-                        (self.field.evenFieldX['flux'],
-                            self.field.evenFieldY['flux']), deltaT, t)
+            self.material[material2].apply((self.field.evenFieldX['flux'],
+                self.field.evenFieldY['flux']), deltaT, t)
